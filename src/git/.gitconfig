@@ -1,0 +1,17 @@
+[init]
+  defaultBranch = main
+[push]
+  default = current
+[color]
+  ui = auto
+[core]
+  excludesfile = ~/.config/git/gitignore
+  autocrlf = input
+[merge]
+  ff = only
+[fetch]
+  prune = true
+[rebase]
+  autosquash = true
+[diff]
+  colorMoved = zebra

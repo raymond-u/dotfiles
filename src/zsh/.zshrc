@@ -1,0 +1,281 @@
+# Enable Powerlevel10k instant prompt
+if [[ -r "${XDG_CACHE_HOME:-${HOME}/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-${HOME}/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# Set zsh options
+setopt APPEND_HISTORY         # Append to history instead of replacing it
+setopt AUTO_CONTINUE          # Disowned jobs are automatically resumed
+setopt COMBINING_CHARS        # Display combining characters correctly
+setopt GLOB_DOTS              # Show hidden files in the completion list
+setopt HIST_EXPIRE_DUPS_FIRST # Remove duplicates first when trimming history
+setopt HIST_FIND_NO_DUPS      # Don't display duplicates when searching
+setopt HIST_IGNORE_SPACE      # Don't record lines starting with a space
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks before recording
+setopt HIST_SAVE_NO_DUPS      # Don't write duplicates in the history file
+setopt INTERACTIVE_COMMENTS   # Allow comments in interactive shells
+setopt LIST_ROWS_FIRST        # Lay out the completion list horizontally
+setopt MULTIOS                # Cast multiple redirections to tees or cats implicitly
+setopt NO_FLOWCONTROL         # Disable flow control key bindings
+setopt PROMPT_SUBST           # Enable parameter expansion, command substitution and arithmetic expansion
+setopt RC_QUOTES              # Use two single quotes to signify a single quote within singly quoted strings
+setopt SHORT_LOOPS            # Allow the short forms of for, repeat, select, if, and function constructs
+
+# Better case-sensitive handling
+zstyle ':completion:*'                                                    matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+
+# Use menu
+zstyle ':completion:*'                                                    menu yes=long select
+
+# List directories first
+zstyle ':completion:*'                                                    list-dirs-first true
+
+# Set descriptions format to enable group support
+zstyle ':completion:*:descriptions'                                       format '[%d]'
+
+# Do not treat // as /*/
+zstyle ':completion:*'                                                    squeeze-slashes true
+
+# Speed up path completion
+zstyle ':completion:*'                                                    use-cache on
+zstyle ':completion:*'                                                    cache-path "${XDG_CACHE_HOME:-${HOME}/.cache}/zsh"
+
+# Partial completion suggestions
+zstyle ':completion:*'                                                    list-suffixes
+zstyle ':completion:*'                                                    expand prefix suffix
+
+# Fuzzy match mistyped completions
+zstyle ':completion:*'                                                    completer _complete _list _match _approximate
+zstyle ':completion:*:match:*'                                            original only
+zstyle ':completion:*:approximate:*'                                      max-errors 1
+zstyle ':completion:*:corrections'                                        format ' %F{green}-- %d (errors: %e) --%f'
+
+# Don't complete unavailable commands
+zstyle ':completion:*:functions'                                          ignored-patterns '(_*|pre(cmd|exec))'
+
+# Array completion element sorting
+zstyle ':completion:*:*:-subscript-:*'                                    tag-order indexes parameters
+
+# Manuals
+zstyle ':completion:*:manuals'                                            separate-sections true
+zstyle ':completion:*:manuals.(^1*)'                                      insert-sections true
+
+# Kill
+zstyle ':completion:*:*:*:*:processes'                                    command 'ps ax -o pid,user,comm -w -w'
+zstyle ':completion:*:*:kill:*:processes'                                 list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
+zstyle ':completion:*:*:kill:*'                                           force-list always
+zstyle ':completion:*:*:kill:*'                                           insert-ids single
+
+# Hosts
+zstyle ':completion:*:(scp|rsync):*'                                      tag-order 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
+zstyle ':completion:*:(scp|rsync):*'                                      group-order users files all-files hosts-domain hosts-host hosts-ipaddr
+zstyle ':completion:*:ssh:*'                                              tag-order users 'hosts:-host:host hosts:-domain:domain hosts:-ipaddr:ip\ address *'
+zstyle ':completion:*:ssh:*'                                              group-order hosts-domain hosts-host users hosts-ipaddr
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host'                       ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-domain'                     ignored-patterns '<->.<->.<->.<->' '^[-[:alnum:]]##(.[-[:alnum:]]##)##' '*@*'
+zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr'                     ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
+
+# Fzf-tab
+zstyle ':fzf-tab:*'                                                       prefix ''
+zstyle ':fzf-tab:*'                                                       fzf-bindings 'space:toggle' 'tab:accept' 'enter:accept' 'right-click:' 'backward-eof:abort'
+zstyle ':fzf-tab:*'                                                       switch-group ';' "'"
+zstyle ':fzf-tab:*'                                                       single-group color
+
+# Fzf-tab preview
+zstyle ':fzf-tab:complete:*'                                              fzf-flags --preview-window=wrap
+zstyle ':fzf-tab:complete:(z|cp|mv|rm|exa|bat):argument-rest'             fzf-preview '[[ -d "${realpath}" ]] && exa -1 --icons --group-directories-first "${realpath}" || bat --color always --style grid,numbers -r :200 "${realpath}"'
+zstyle ':fzf-tab:complete:(-parameter-|-brace-parameter-|export|unset):*' fzf-preview 'echo "${(P)word}"'
+# [ is_linux start ]
+zstyle ':fzf-tab:complete:systemctl-*:*'                                  fzf-preview 'SYSTEMD_COLORS=1 systemctl status "${word}"'
+# [ is_linux end ]
+# [ is_macos start ]
+zstyle ':fzf-tab:complete:brew-(install|uninstall|search|info):*'         fzf-preview 'brew info "${word}"'
+# [ is_macos end ]
+
+# Aliases for system commands
+alias c='cat'
+alias cat='bat --pager "less -RXFe"'
+alias d='wget'
+alias find='fd'
+alias grep='rg'
+alias l='ls'
+alias la='ls -la'
+alias ll='ls -laF'
+alias ls='exa --icons --group-directories-first'
+alias lsd='exa -D --icons'
+alias le='less'
+alias less='bat --pager "less -R --mouse" --color always --style grid,numbers'
+alias mkdir='mkdir -p'
+alias quit='exit'
+alias rl='readlink -f'
+alias rp='realpath'
+
+# Aliases for user commands
+# [ is_linux start ]
+alias conac='conda activate'
+alias conde='conda deactivate'
+alias concr='conda create -n'
+alias conre='conda remove -n'
+alias conin='mamba install'
+# [ is_linux end ]
+alias gc='git commit -m'
+alias gp='git push origin'
+
+# Functions as aliases
+alias bashrc='nvim "${HOME}/.bashrc"'
+alias zshrc='nvim "${HOME}/.zshrc"'
+# [ can_sudo start ]
+alias reload='echo; exec sudo --login --user "${USER}" bash -c "cd \"${PWD}\"; exec \"${SHELL}\" -l"'
+# [ can_sudo end ]
+# [ ! can_sudo start ]
+alias reload='echo; exec "${SHELL}" -l'
+# [ ! can_sudo end ]
+alias ip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
+# [ is_macos start ]
+alias hosts='nvim /private/etc/hosts'
+alias fix='sudo xattr -d com.apple.quarantine'
+alias mac='ifconfig en0 | rg ether'
+alias macrand='openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//" | xargs sudo ifconfig en0 ether'
+# [ is_macos end ]
+
+# Functions
+home-env() {
+    local version
+    local flags
+    local pkgs
+    # [ @ version=version ]
+    # [ @ flags=flags ]
+    # [ @ pkgs=pkgs ]
+    
+    if [[ "$1" == 'list' ]]; then
+        echo "${pkgs}"
+    elif [[ "$1" == 'update' ]]; then
+        local script="$(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/install.sh)"
+        
+        # Caveat: Watch out for version numbers that go over 10
+        if [[ ! "$(bash -c "${script}" -s -v)" > "${version}" ]]; then
+            echo 'Home environment is up-to-date.'
+            return 0
+        fi
+        
+        bash -c "${script}" -s -u ${flags}
+    fi
+}
+weather() {
+    curl -fsS 'wttr.in/'"$1"'?mMAF'
+}
+
+# [ is_macos_arm64 start ]
+# Initialize homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# [ is_macos_arm64 end ]
+
+# Set general envs
+export HISTFILE="${HOME}/.zsh_history"
+export HISTSIZE=10000
+export SAVEHIST=10000
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+export EDITOR='nvim'
+export VISUAL='nvim'
+# [ is_linux start ]
+export PATH="${HOME}/bin${PATH:+:${PATH}}"
+# [ is_linux end ]
+# [ is_macos start ]
+export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
+# [ is_macos end ]
+
+# [ is_linux start ]
+# Configure completions for Nix
+for profile in ''${(z)NIX_PROFILES}; do
+    fpath+=(
+        "${profile}/share/zsh/site-functions"
+        "${profile}/share/zsh/${ZSH_VERSION}/functions"
+        "${profile}/share/zsh/vendor-completions"
+    )
+done
+# [ is_linux end ]
+
+# Configure fzf
+export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,right-click:,backward-eof:abort'
+
+# [ use_mirror start ]
+# [ is_macos start ]
+# Configure Homebrew
+export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
+export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
+export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles
+# [ is_macos end ]
+# [ use_mirror end ]
+
+# Configure less
+export LESS='-R -i --wheel-lines=3'
+
+# Configure man
+export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
+export MANROFFOPT='-c'
+
+# [ is_linux start ]
+# Uncomment this if locale of nix packages was broken
+# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE="/usr/bin/locale"
+# [ is_linux end ]
+
+# Initialize zinit
+source "${HOME}/.local/share/zinit/zinit.git/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+# Load themes
+zinit lucid depth"1" light-mode for                                                                                   \
+    atload"zstyle ':completion:*' list-colors \${(s.:.)LS_COLORS}"                                                    \
+        trapd00r/LS_COLORS                                                                                            \
+    atload"[[ ! -f ${HOME}/.config/powerlevel10k/p10k.zsh ]] || source ${HOME}/.config/powerlevel10k/p10k.zsh"        \
+        romkatv/powerlevel10k
+
+# Load plugins
+zinit wait lucid depth"1" for                                                                                         \
+    atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit"                                                                       \
+    compile"lib/{*ftb*,zsh-ls-colors/ls-colors.zsh}"                                                                  \
+    blockf                                                                                                            \
+        Aloxaf/fzf-tab                                                                                                \
+    atinit"ZSH_FZF_HISTORY_SEARCH_FZF_ARGS='+s +m --reverse --height=80%'; ZSH_FZF_HISTORY_SEARCH_END_OF_LINE=true"   \
+        joshskidmore/zsh-fzf-history-search                                                                           \
+    zsh-users/zsh-autosuggestions                                                                                     \
+    zdharma-continuum/fast-syntax-highlighting
+
+# Load completions
+zinit wait lucid depth"1" blockf for                                                                                  \
+    # [ is_linux start ]
+    conda-incubator/conda-zsh-completion                                                                              \
+    spwhitt/nix-zsh-completions                                                                                       \
+    # [ is_linux end ]
+    zsh-users/zsh-completions                                                                                         \
+    atload"zicdreplay"                                                                                                \
+        zdharma-continuum/null
+
+# Lazy-load plugins
+zinit wait lucid depth"1" light-mode for                                                                              \
+    trigger-load"!glo;!gd;!ga;!grh;!gi;!gcf;!gcb;!gbd;!gct;!gco;!grc;!gclean;!gss;!gcp;!grb;!gbl;!gfu"                \
+        wfxr/forgit                                                                                                   \
+    trigger-load"!ugit"                                                                                               \
+        Bhupesh-V/ugit                                                                                                \
+    trigger-load"!x"                                                                                                  \
+        OMZ::plugins/extract
+
+# [ is_macos start ]
+# Initialize command-not-found
+if [[ -f "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
+    source "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+fi
+# [ is_macos end ]
+
+# Initialize the fuck
+eval "$(thefuck --alias fk)"
+
+# Initialize zoxide
+eval "$(zoxide init zsh)"
+alias cd='z'

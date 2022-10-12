@@ -1,0 +1,84 @@
+# Shells
+brew "bash"
+brew "zsh"
+
+# System commands
+brew "coreutils"
+brew "gawk"
+brew "gnu-sed"
+brew "less"
+
+# General commands
+brew "bat"
+brew "exa"
+brew "fd"
+brew "fzf"
+brew "ripgrep"
+brew "zoxide"
+
+# System utilities
+brew "duf"
+brew "htop"
+brew "ncdu"
+brew "neofetch"
+brew "procs"
+brew "thefuck"
+brew "tldr"
+brew "tree"
+
+# General utilities
+brew "age"
+brew "pandoc"
+brew "rename"
+
+# Text editors
+brew "nano"
+brew "neovim"
+brew "vim"
+
+# Web
+brew "aria2"
+brew "curl"
+brew "httpie"
+brew "openssh"
+brew "qrcp"
+brew "wget"
+
+# Languages
+brew "node"
+brew "openjdk"
+brew "python"
+brew "r"
+brew "rust"
+
+# Fonts
+cask "font-sarasa-gothic"
+
+# [ install_cask start ]
+# Academics
+cask "zotero"
+
+# IDE
+cask "visual-studio-code"
+
+# Media players
+cask "iina"
+
+# Productivity
+cask "amethyst"
+
+# Network
+cask "clashx"
+cask "lulu"
+
+# Terminal
+cask "wezterm"
+
+# Utilities
+cask "keka"
+cask "xnconvert"
+cask "xnviewmp"
+
+# Web browser
+cask "google-chrome"
+# [ install_cask end ]
