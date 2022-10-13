@@ -68,7 +68,6 @@ cask "iina"
 cask "amethyst"
 
 # Network
-cask "clashx"
 cask "lulu"
 
 # Terminal

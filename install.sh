@@ -107,7 +107,6 @@ cask_pkgs=(
     '  maccy'
     ''
     '# Network'
-    '  clashx'
     '  lulu'
     ''
     '# Terminal'
