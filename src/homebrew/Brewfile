@@ -61,9 +61,6 @@ cask "zotero"
 # IDE
 cask "visual-studio-code"
 
-# Media players
-cask "iina"
-
 # Productivity
 cask "amethyst"
 
