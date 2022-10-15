@@ -99,12 +99,8 @@ cask_pkgs=(
     '# IDE'
     '  visual-studio-code'
     ''
-    '# Media players'
-    '  iina'
-    ''
     '# Productivity'
-    '  amethyst'
-    '  maccy'
+    '  raycast'
     ''
     '# Network'
     '  lulu'
@@ -754,12 +750,6 @@ if is_true 'is_linux'; then
     
 # Configure for macOS
 elif is_true 'is_macos'; then
-    # Check if git is just a dummy
-    while [[ ! "$(git --version 2>/dev/null)" =~ 'git version' ]]; do
-        prompt_continue 'Please install git manually.'
-        is_dry_run && break
-    done
-    
     # Prompt for the identity file
     is_true 'has_identity' || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' 'has_identity'
     if is_true 'has_identity' && ! is_true 'identity_file'; then
@@ -784,7 +774,6 @@ elif is_true 'is_macos'; then
         log_section 'macOS Configuration'
         log_info 'Configure general UI/UX...'
         log_info 'Configure trackpad, mouse and keyboard...'
-        log_info 'Configure locale...'
         log_info 'Configure energy saving...'
         log_info 'Configure screen...'
         log_info 'Configure bluetooth accessories...'

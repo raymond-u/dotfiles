@@ -66,19 +66,6 @@ defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 
 ###############################################################################
-# Locale                                                                      #
-###############################################################################
-
-# Set language
-defaults write NSGlobalDomain AppleLanguages -array "en" "en-US" "ja-US" "zh-Hans-US"
-defaults write NSGlobalDomain AppleLocale -string "en_US"
-
-# Set formats
-defaults write NSGlobalDomain AppleMeasurementUnits -string "Centimeters"
-defaults write NSGlobalDomain AppleMetricUnits -bool true
-defaults write NSGlobalDomain AppleTemperatureUnit -string "Celsius"
-
-###############################################################################
 # Energy saving                                                               #
 ###############################################################################
 
@@ -107,12 +94,6 @@ sudo pmset -c sleep 0
 # Require password immediately after sleep or screen saver begins
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
-
-# Save screenshots to Desktop
-defaults write com.apple.screencapture location -string "${HOME}/Desktop"
-
-# Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
-defaults write com.apple.screencapture type -string "png"
 
 # Disable shadow in screenshots
 defaults write com.apple.screencapture disable-shadow -bool true
@@ -153,14 +134,8 @@ defaults write com.apple.DiskUtility advanced-image-options -bool true
 # Dock, Dashboard, Mission Control                                            #
 ###############################################################################
 
-# Speed up Mission Control animations
-defaults write com.apple.dock expose-animation-duration -float 0.1
-
 # Don’t automatically rearrange Spaces based on most recent use
 defaults write com.apple.dock mru-spaces -bool false
-
-# Show dot indicators for running applications
-defaults write com.apple.dock show-process-indicators -bool true
 
 # Make Dock icons of hidden applications translucent
 defaults write com.apple.dock showhidden -bool true
@@ -362,3 +337,4 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
+
