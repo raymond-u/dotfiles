@@ -96,6 +96,7 @@ zstyle ':fzf-tab:complete:brew-(install|uninstall|search|info):*'         fzf-pr
 alias c='cat'
 alias cat='bat --pager "less -RXFe"'
 alias d='wget'
+alias e='nvim'
 alias find='fd'
 alias grep='rg'
 alias l='ls'

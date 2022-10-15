@@ -755,10 +755,6 @@ elif is_true 'is_macos'; then
     log_info 'Create empty folders in the home directory...'
     is_dry_run || mkdir -p "${HOME}/.local/bin" "${HOME}/Playground" "${HOME}/Projects/visual_studio_code"
     
-    # Request access to user directories
-    ls "${HOME}/Documents" >/dev/null
-    ls "${HOME}/Downloads" >/dev/null
-    
     # Prompt for the identity file
     is_true 'has_identity' || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' 'has_identity'
     if is_true 'has_identity' && ! is_true 'identity_file'; then
@@ -769,6 +765,15 @@ elif is_true 'is_macos'; then
             prompt_string 'Please enter the path to the identity file.' 'identity_file'
             [[ -f "${identity_file}" ]] || has_identity=false
         fi
+    fi
+    
+    # Request access to user directories if necessary
+    if [[ "${identity_file}" =~ "${HOME}/Desktop" ]]; then
+        ls "${HOME}/Desktop" >/dev/null
+    elif [[ "${identity_file}" =~ "${HOME}/Documents" ]]; then
+        ls "${HOME}/Documents" >/dev/null
+    elif [[ "${identity_file}" =~ "${HOME}/Downloads" ]]; then
+        ls "${HOME}/Downloads" >/dev/null
     fi
     
     # Prompt for the passphrase
