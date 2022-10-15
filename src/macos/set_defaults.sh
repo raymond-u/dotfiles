@@ -69,9 +69,6 @@ defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
 # Energy saving                                                               #
 ###############################################################################
 
-# Restart automatically if the computer freezes
-sudo systemsetup -setrestartfreeze on
-
 # Restart automatically on power loss
 sudo pmset -a autorestart 1
 
@@ -216,9 +213,6 @@ defaults write com.apple.finder WarnOnEmptyTrash -bool false
 
 # Enable AirDrop over Ethernet
 defaults write com.apple.NetworkBrowser BrowseAllInterfaces -bool true
-
-# Show the ~/Library folder
-chflags nohidden ~/Library && xattr -d com.apple.FinderInfo ~/Library
 
 # Show the /Volumes folder
 sudo chflags nohidden /Volumes

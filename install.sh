@@ -85,6 +85,7 @@ brew_pkgs=(
     ''
     '# Languages'
     '  node'
+    '  openjdk'
     '  python'
     '  r'
     '  rust'
