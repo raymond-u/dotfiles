@@ -62,7 +62,7 @@ cask "zotero"
 cask "visual-studio-code"
 
 # Productivity
-cask "amethyst"
+cask "raycast"
 
 # Network
 cask "lulu"

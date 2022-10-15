@@ -62,6 +62,9 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool
 defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
+# Always enable key repeats
+defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
+
 ###############################################################################
 # Locale                                                                      #
 ###############################################################################
@@ -105,8 +108,8 @@ sudo pmset -c sleep 0
 defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
-# Save screenshots to Documents
-defaults write com.apple.screencapture location -string "${HOME}/Documents"
+# Save screenshots to Desktop
+defaults write com.apple.screencapture location -string "${HOME}/Desktop"
 
 # Save screenshots in PNG format (other options: BMP, GIF, JPG, PDF, TIFF)
 defaults write com.apple.screencapture type -string "png"
@@ -182,7 +185,7 @@ defaults write com.apple.dock wvous-tl-modifier -int 0
 # Top right screen corner → Notification center
 defaults write com.apple.dock wvous-tr-corner -int 12
 defaults write com.apple.dock wvous-tr-modifier -int 0
-# Bottom left screen corner → Launchpad
+# Bottom left screen corner → Put display to sleep
 defaults write com.apple.dock wvous-bl-corner -int 10
 defaults write com.apple.dock wvous-bl-modifier -int 0
 # Bottom right screen corner → Desktop
@@ -359,6 +362,3 @@ defaults write com.apple.TextEdit PlainTextEncodingForWrite -int 4
 
 # Prevent Time Machine from prompting to use new hard drives as backup volume
 defaults write com.apple.TimeMachine DoNotOfferNewDisksForBackup -bool true
-
-# Disable local Time Machine backups
-hash tmutil &> /dev/null && sudo tmutil disablelocal
