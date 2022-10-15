@@ -121,6 +121,9 @@ alias conin='mamba install'
 # [ is_linux end ]
 alias gc='git commit -m'
 alias gp='git push origin'
+# [ has_identity start ]
+alias pass='passage'
+# [ has_identity end ]
 
 # Functions as aliases
 alias bashrc='nvim "${HOME}/.bashrc"'
@@ -198,6 +201,9 @@ for profile in ''${(z)NIX_PROFILES}; do
     )
 done
 # [ is_linux end ]
+# [ is_macos start ]
+fpath+=("/opt/homebrew/share/zsh/site-functions")
+# [ is_macos end ]
 
 # Configure fzf
 export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,right-click:,backward-eof:abort'

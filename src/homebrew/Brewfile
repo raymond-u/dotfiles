@@ -5,6 +5,7 @@ brew "zsh"
 # System commands
 brew "coreutils"
 brew "gawk"
+brew "gnu-getopt"
 brew "gnu-sed"
 brew "less"
 
