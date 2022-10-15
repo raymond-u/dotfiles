@@ -877,7 +877,7 @@ elif is_true 'is_macos'; then
             if ! is_dry_run; then
                 pushd "${tmpdir}/passage" >/dev/null
                 make "PREFIX=${HOME}/.passage/passage" install
-                ln -s "${HOME}/.passage/passage/bin/passage" "${HOME}/.local/bin"
+                ln -sf "${HOME}/.passage/passage/bin/passage" "${HOME}/.local/bin"
                 popd >/dev/null
             fi
         fi
