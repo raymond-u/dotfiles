@@ -751,6 +751,14 @@ if is_true 'is_linux'; then
     
 # Configure for macOS
 elif is_true 'is_macos'; then
+    # Create emoty folders
+    log_info 'Create empty folders in the home directory...'
+    is_dry_run || mkdir -p "${HOME}/.local/bin" "${HOME}/Playground" "${HOME}/Projects/visual_studio_code"
+    
+    # Request access to user directories
+    ls "${HOME}/Documents" >/dev/null
+    ls "${HOME}/Downloads" >/dev/null
+    
     # Prompt for the identity file
     is_true 'has_identity' || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' 'has_identity'
     if is_true 'has_identity' && ! is_true 'identity_file'; then
@@ -765,10 +773,6 @@ elif is_true 'is_macos'; then
     
     # Prompt for the passphrase
     ! is_true 'has_identity' || prompt_passphrase "Please enter the passphrase of the identity file. (If there isn't one, just hit enter.)" 'passphrase'
-    
-    # Create emoty folders
-    log_info 'Create empty folders in the home directory...'
-    is_dry_run || mkdir -p "${HOME}/.local/bin" "${HOME}/Playground" "${HOME}/Projects/visual_studio_code"
     
     # Configure macOS
     if ! is_true 'update'; then
@@ -884,7 +888,7 @@ elif is_true 'is_macos'; then
         
         # Set up passage store
         log_info "Extract passage store to ${HOME}/.passage/store..."
-        is_dry_run || bash "${crypto}" -p "$(which age)" -d -i "${identity_file}" <<<"$(<"${passage_store}") ${passphrase}" | tar -xzC "${HOME}/.passage"
+        is_dry_run || bash "${crypto}" -p "$(which age)" -d -i "${identity_file}" <<<"$(<"${passage_store}") ${passphrase}" | base64 -d | tar -xzC "${HOME}/.passage"
         
         # Move the identity file
         if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then

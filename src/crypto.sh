@@ -135,5 +135,5 @@ EOF
     
     # Automate decryption
     expect -f "${tmpdir}/age_helper" "${tmpdir}/age_script" <<<"${passphrase}" | perl -0777 -pe 's/^[\n\r]*(.*?)[\n\r]*$/\1/s'
-    rm -r "${tmpdir}"
+    rm -rf "${tmpdir}"
 fi
