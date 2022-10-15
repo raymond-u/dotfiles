@@ -162,7 +162,16 @@ home-env() {
             return 0
         fi
         
-        bash -c "${script}" -s -u ${flags}
+        bash -c "${script}" -s -u $(echo "${flags}")
+    elif [[ -z "${1+_}" ]] || [[ "$1" == 'help' ]]; then
+        echo 'Usage:'
+        echo '  home-env [<commands>]'
+        echo
+        echo 'Commands:'
+        echo '  list -- List packages installed with home environment.'
+        echo '  update -- Update dotfiles and installed packages.'
+    else
+        echo 'Unknown command. Use "home-env help" to show help.'
     fi
 }
 weather() {

@@ -173,7 +173,7 @@ for _pair in ${_pairs}; do
         echo "Error: The value of ${_value} is unknown." >&2
         exit 1
     else
-        _file_string="$(perl -0777 -pse 's/^ *(?:-- )?# \[ @ \Q$old\E \]$/$new/m' -- -old="${_pair}" -new="${_name}='${!_value}'" <<<"${_file_string}")"
+        _file_string="$(perl -0777 -pse 's/^( *)(?:-- )?# \[ @ \Q$old\E \]$/\1$new/m' -- -old="${_pair}" -new="${_name}='${!_value}'" <<<"${_file_string}")"
     fi
 done
 
