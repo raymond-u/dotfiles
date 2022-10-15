@@ -405,9 +405,11 @@ put_dotfile() {
     log_info "Put $1 dotfile to $3."
     if ! is_dry_run; then
         if [[ -f "$3" ]]; then
-            log_info "$1 dotfile already exists. Rename it to $3.old."
-            reminders+=("$1: Old dotfile lingers in $3.old.")
-            mv "$3" "$3.old"
+            if ! is_true 'update'; then
+                log_info "$1 dotfile already exists. Rename it to $3.old."
+                reminders+=("$1: Old dotfile lingers in $3.old.")
+                mv "$3" "$3.old"
+            fi
         else
             mkdir -p "$(dirname "$3")"
         fi
@@ -821,6 +823,10 @@ elif is_true 'is_macos'; then
         if is_true 'is_macos_arm64'; then
             is_dry_run || eval "$(/opt/homebrew/bin/brew shellenv)"
         fi
+        
+        # Install command-not-found
+        log_info 'Install Homebrew command-not-found...'
+        is_dry_run || brew command-not-found-init
     fi
     
     # Prompt for installation of GUI applications

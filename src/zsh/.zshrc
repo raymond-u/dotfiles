@@ -210,9 +210,9 @@ for profile in ''${(z)NIX_PROFILES}; do
     )
 done
 # [ is_linux end ]
-# [ is_macos start ]
-fpath+=("/opt/homebrew/share/zsh/site-functions")
-# [ is_macos end ]
+# [ is_macos_arm64 start ]
+fpath+=("$(brew --prefix)/share/zsh/site-functions")
+# [ is_macos_arm64 end ]
 
 # Configure fzf
 export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,right-click:,backward-eof:abort'
@@ -239,6 +239,20 @@ export MANROFFOPT='-c'
 # export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
 # export LOCALE_ARCHIVE="/usr/bin/locale"
 # [ is_linux end ]
+
+# [ is_macos start ]
+# Initialize command-not-found
+# [ is_macos_arm64 start ]
+if [[ -f "$(brew --prefix)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
+    source "$(brew --prefix)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+fi
+# [ is_macos_arm64 end ]
+# [ ! is_macos_arm64 start ]
+if [[ -f "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
+    source "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+fi
+# [ ! is_macos_arm64 end ]
+# [ is_macos end ]
 
 # Initialize zinit
 source "${HOME}/.local/share/zinit/zinit.git/zinit.zsh"
