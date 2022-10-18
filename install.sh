@@ -613,7 +613,7 @@ if is_true 'is_linux'; then
             _nix_installation=
             if is_true 'can_sudo'; then
                 # Check if SELinux has been disabled
-                ! "$(selinuxenabled 2>/dev/null)" || sudo setenforce 'Permissive'
+                ! selinuxenabled 2>/dev/null || sudo setenforce 'Permissive'
                 _nix_installation='multi-user'
             else
                 if [[ -d /nix ]]; then
@@ -621,7 +621,7 @@ if is_true 'is_linux'; then
                     _nix_installation="$(selinuxenabled 2>/dev/null && echo 'single-user' || echo 'multi-user')"
                 else
                     # Check if OS supports user namespaces for unprivileged users
-                    if [[ "$(unshare --user --pid echo YES 2>/dev/null)" == 'YES' ]]; then
+                    if [[ "$(unshare --user --pid echo 'YES' 2>/dev/null)" == 'YES' ]]; then
                         _nix_installation='nix-user-chroot'
                     else
                         _nix_installation='proot'
