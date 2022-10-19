@@ -635,14 +635,14 @@ if is_true 'is_linux'; then
                     log_info 'Install Nix in multi-user mode...'
                     if ! is_dry_run; then
                         sh <(curl -L https://nixos.org/nix/install) --daemon
-                        source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+                        source /etc/profile.d/nix.sh
                     fi
                     ;;
                 single-user)
                     log_info 'Install Nix in single-user mode...'
                     if ! is_dry_run; then
                         sh <(curl -L https://nixos.org/nix/install) --no-daemon
-                        source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+                        source /etc/profile.d/nix.sh
                     fi
                     ;;
                 nix-user-chroot)
