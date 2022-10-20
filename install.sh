@@ -635,7 +635,7 @@ if is_true 'is_linux'; then
         fi
         
         # Install Nix
-        if [[ -z "$(nix-build --version 2>/dev/null)" ]]; then
+        if [[ -z "$(command -v nix-build)" ]]; then
             # Determine how to install Nix
             _nix_installation=
             if is_true 'can_sudo'; then
@@ -701,11 +701,12 @@ if is_true 'is_linux'; then
                     reminders+=('PRoot: Note that you can only use Nix and the installed packages within the shell started by "proot -b ~/.nix:/nix".')
                     ;;
             esac
+            unset _nix_installation
         fi
     fi
     
     # Install from Nix
-    if [[ "${_nix_installation}" == 'multi-user' ]] || [[ "${_nix_installation}" == 'single-user' ]]; then
+    if [[ -n "$(command -v nix-build)" ]]; then
         log_section 'Nix Packages'
         log_info "$(get_package_list)" 'yellow'
         
@@ -714,7 +715,6 @@ if is_true 'is_linux'; then
         log_info 'Install packages...'
         is_dry_run || nix-env -i -f "${nix_env}"
     fi
-    unset _nix_installation
     
     # Configure Zsh
     if ! is_true 'update'; then
