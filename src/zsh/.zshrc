@@ -1,6 +1,6 @@
 # Enable Powerlevel10k instant prompt
-if [[ -r "${XDG_CACHE_HOME:-${HOME}/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${XDG_CACHE_HOME:-${HOME}/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+if [[ -r "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
 # Set zsh options
@@ -38,7 +38,7 @@ zstyle ':completion:*'                                                    squeez
 
 # Speed up path completion
 zstyle ':completion:*'                                                    use-cache on
-zstyle ':completion:*'                                                    cache-path "${XDG_CACHE_HOME:-${HOME}/.cache}/zsh"
+zstyle ':completion:*'                                                    cache-path "${HOME}/.cache/zsh"
 
 # Partial completion suggestions
 zstyle ':completion:*'                                                    list-suffixes
@@ -91,6 +91,71 @@ zstyle ':fzf-tab:complete:systemctl-*:*'                                  fzf-pr
 # [ is_macos start ]
 zstyle ':fzf-tab:complete:brew-(install|uninstall|search|info):*'         fzf-preview 'brew info "${word}"'
 # [ is_macos end ]
+
+# [ is_macos_arm64 start ]
+# Initialize homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# [ is_macos_arm64 end ]
+
+# Set general envs
+export HISTFILE="${HOME}/.zsh_history"
+export HISTSIZE=10000
+export SAVEHIST=10000
+export XDG_CACHE_HOME="${HOME}/.cache"
+export XDG_CONFIG_HOME="${HOME}/.config"
+export XDG_DATA_HOME="${HOME}/.local/share"
+export XDG_STATE_HOME="${HOME}/.local/state"
+export EDITOR='nvim'
+export VISUAL='nvim'
+# [ is_linux start ]
+export PATH="${HOME}/bin${PATH:+:${PATH}}"
+# [ is_linux end ]
+# [ is_macos start ]
+export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
+# [ is_macos end ]
+
+# [ is_linux start ]
+# Configure completions for Nix
+for profile in ''${(z)NIX_PROFILES}; do
+    fpath+=(
+        "${profile}/share/zsh/site-functions"
+        "${profile}/share/zsh/${ZSH_VERSION}/functions"
+        "${profile}/share/zsh/vendor-completions"
+    )
+done
+# [ is_linux end ]
+# [ is_macos_arm64 start ]
+fpath+=("$(brew --prefix)/share/zsh/site-functions")
+# [ is_macos_arm64 end ]
+
+# Configure fzf
+export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,ctrl-a:toggle-all,right-click:,backward-eof:abort'
+
+# [ use_mirror start ]
+# [ is_macos start ]
+# Configure Homebrew
+export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
+export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
+export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles
+# [ is_macos end ]
+# [ use_mirror end ]
+
+# Configure less
+export LESS='-R -i --wheel-lines=3'
+
+# Configure man
+export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
+export MANROFFOPT='-c'
+
+# Configure wget
+export WGETRC="${HOME}/.config/wget/wgetrc"
+
+# [ is_linux start ]
+# Uncomment this if locale of nix packages was broken
+# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE="/usr/bin/locale"
+# [ is_linux end ]
 
 # Aliases for system commands
 alias c='cat'
@@ -174,71 +239,31 @@ home-env() {
         echo 'Unknown command. Use "home-env help" to show help.'
     fi
 }
+# [ can_sudo start ]
+port() {
+    if (( $# == 0 )); then
+        sudo lsof -iTCP -sTCP:LISTEN -n -P
+    else
+        local command='sudo lsof -iTCP -sTCP:LISTEN -n -P'
+        for (( i = 1; i <= $#; i++ )); do
+            if (( i == $# )); then
+                command="${command} | rg -i '${(P)i}'"
+            else
+                command="${command} | rg -i --color=always '${(P)i}'"
+            fi
+        done
+        eval "${command}"
+    fi
+}
+# [ can_sudo end ]
 weather() {
     curl -fsS 'wttr.in/'"$1"'?mMAF'
 }
 
-# [ is_macos_arm64 start ]
-# Initialize homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# [ is_macos_arm64 end ]
-
-# Set general envs
-export HISTFILE="${HOME}/.zsh_history"
-export HISTSIZE=10000
-export SAVEHIST=10000
-export XDG_CACHE_HOME="${HOME}/.cache"
-export XDG_CONFIG_HOME="${HOME}/.config"
-export XDG_DATA_HOME="${HOME}/.local/share"
-export XDG_STATE_HOME="${HOME}/.local/state"
-export EDITOR='nvim'
-export VISUAL='nvim'
-# [ is_linux start ]
-export PATH="${HOME}/bin${PATH:+:${PATH}}"
-# [ is_linux end ]
-# [ is_macos start ]
-export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
-# [ is_macos end ]
-
-# [ is_linux start ]
-# Configure completions for Nix
-for profile in ''${(z)NIX_PROFILES}; do
-    fpath+=(
-        "${profile}/share/zsh/site-functions"
-        "${profile}/share/zsh/${ZSH_VERSION}/functions"
-        "${profile}/share/zsh/vendor-completions"
-    )
-done
-# [ is_linux end ]
-# [ is_macos_arm64 start ]
-fpath+=("$(brew --prefix)/share/zsh/site-functions")
-# [ is_macos_arm64 end ]
-
-# Configure fzf
-export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,right-click:,backward-eof:abort'
-
-# [ use_mirror start ]
-# [ is_macos start ]
-# Configure Homebrew
-export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
-export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
-export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles
-# [ is_macos end ]
-# [ use_mirror end ]
-
-# Configure less
-export LESS='-R -i --wheel-lines=3'
-
-# Configure man
-export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
-export MANROFFOPT='-c'
-
-# [ is_linux start ]
-# Uncomment this if locale of nix packages was broken
-# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE="/usr/bin/locale"
-# [ is_linux end ]
+# Source local .zshrc
+if [[ -f "${HOME}/.zshrc.local" ]]; then
+    source "${HOME}/.zshrc.local"
+fi
 
 # [ is_macos start ]
 # Initialize command-not-found
@@ -309,3 +334,11 @@ eval "$(thefuck --alias fk)"
 # Initialize zoxide
 eval "$(zoxide init zsh)"
 alias cd='z'
+
+# [ is_linux start ]
+# Initialize conda
+eval "$("${HOME}/opt/miniconda3/bin/conda" shell.zsh hook)"
+
+# Initialize rust
+source "${HOME}/.cargo/env"
+# [ is_linux end ]

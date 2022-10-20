@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.1.1'
+version='0.2.0'
 
 # Scripts
 crypto=src/crypto.sh
@@ -23,16 +23,17 @@ set_defaults=src/macos/set_defaults.sh
 # Config files
 aria2=src/aria2/aria2.conf
 brewfile=src/homebrew/Brewfile
+clash_archive=src/clash/archive.age
 gitconfig=src/git/.gitconfig
 gitignore=src/git/gitignore
 htoprc=src/htop/htoprc
 hushlogin=src/misc/.hushlogin
 nix_env=src/nix/env.nix
 p10k=src/powerlevel10k/p10k.zsh
-passage_store=src/passage/store.age
-ssh_config=src/ssh/config
+passage_archive=src/passage/archive.age
+ssh_archive=src/ssh/archive.age
 wezterm=src/wezterm/wezterm.lua
-wgetrc=src/wget/.wgetrc
+wgetrc=src/wget/wgetrc
 zshrc=src/zsh/.zshrc
 
 # Package list
@@ -124,7 +125,7 @@ nix_pkgs=(
     '  zsh'
     ''
     '# Terminal multiplexer'
-    'wezterm'
+    '  wezterm'
     ''
     '# System commands'
     '  coreutils'
@@ -563,7 +564,7 @@ fi
 # Check prerequisites
 _prerequisites=()
 if is_true 'is_linux'; then
-    _prerequisites=('chmod' 'curl' 'dirname' 'git' 'ls' 'mkdir' 'mktemp' 'mv' 'uname')
+    _prerequisites=('chmod' 'curl' 'dirname' 'git' 'ls' 'mkdir' 'mktemp' 'mv' 'readlink' 'uname')
 elif is_true 'is_macos'; then
     _prerequisites=('base64' 'curl' 'dirname' 'expect' 'git' 'ls' 'make' 'mkdir' 'mktemp' 'mv' 'perl' 'tar' 'uname')
 fi
@@ -608,6 +609,32 @@ if is_true 'is_linux'; then
     
     # Configure Nix
     if ! is_true 'update'; then
+        log_section 'Nix Configuration'
+        
+        # Use mirror for Nix
+        if is_true 'use_mirror'; then
+            _can_use_mirror=true
+            if [[ ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store' ]]; then
+                if is_true 'can_sudo'; then
+                    log_info 'Add TUNA mirror as a trusted substituter.'
+                    is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
+                else
+                    log_error 'Warning: TUNA mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
+                    log_error 'Abort setting mirror for Nix.'
+                    _can_use_mirror=false
+                fi
+            fi
+            if is_true '_can_use_mirror'; then
+                log_info 'Use TUNA mirror for Nix.'
+                if ! is_dry_run; then
+                    mkdir -p "${HOME}/.config/nix"
+                    echo 'substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
+                fi
+            fi
+            unset _can_use_mirror
+        fi
+        
+        # Install Nix
         if [[ -z "$(nix-build --version 2>/dev/null)" ]]; then
             # Determine how to install Nix
             _nix_installation=
@@ -628,8 +655,6 @@ if is_true 'is_linux'; then
                     fi
                 fi
             fi
-            
-            # Install Nix
             case "${_nix_installation}" in
                 multi-user)
                     log_info 'Install Nix in multi-user mode...'
@@ -676,29 +701,20 @@ if is_true 'is_linux'; then
                     reminders+=('PRoot: Note that you can only use Nix and the installed packages within the shell started by "proot -b ~/.nix:/nix".')
                     ;;
             esac
-            unset _nix_installation
-            
-            # Set mirror for Nix
-            if is_true 'use_mirror'; then
-                log_info 'Use TUNA mirror for Nix.'
-                if ! is_dry_run; then
-                    mkdir -p "${HOME}/.config/nix"
-                    echo 'substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                fi
-            fi
         fi
     fi
     
-    # Prompt for confirmation of package installation
-    log_section 'Nix Packages'
-    log_info "$(get_package_list)" 'yellow'
-    prompt_continue 'About to install the above packages from Nix.'
-    
     # Install from Nix
-    if [[ "${_nix_installation}" != 'multi-user' ]] && [[ "${_nix_installation}" != 'single-user' ]]; then
+    if [[ "${_nix_installation}" == 'multi-user' ]] || [[ "${_nix_installation}" == 'single-user' ]]; then
+        log_section 'Nix Packages'
+        log_info "$(get_package_list)" 'yellow'
+        
+        # Prompt for confirmation of package installation
+        prompt_continue 'About to install the above packages from Nix.'
         log_info 'Install packages...'
         is_dry_run || nix-env -i -f "${nix_env}"
     fi
+    unset _nix_installation
     
     # Configure Zsh
     if ! is_true 'update'; then
@@ -712,8 +728,22 @@ if is_true 'is_linux'; then
         
         # Change the login shell to Zsh
         if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then
-            log_info 'Change the login shell to Zsh.'
-            is_dry_run || chsh -s "$(command -v zsh)"
+            _can_use_zsh=true
+            if [[ ! "$(</etc/shells)" =~ "$(readlink -f "$(command -v zsh)")" ]]; then
+                if is_true 'can_sudo'; then
+                    log_info "Add Zsh to /etc/shells."
+                    is_dry_run || sudo bash -c 'readlink -f "$1" >>/etc/shells' -s "$(command -v zsh)"
+                else
+                    log_error "Warning: Zsh is not listed as a valid shell. Sudo is needed to add it to /etc/shells."
+                    log_error "Abort changing the login shell to Zsh."
+                    _can_use_zsh=false
+                fi
+            fi
+            if is_true '_can_use_zsh'; then
+                log_info 'Change the login shell to Zsh.'
+                is_dry_run || chsh -s "$(readlink -f "$(command -v zsh)")"
+            fi
+            unset _can_use_zsh
         fi
     fi
     
@@ -738,6 +768,69 @@ if is_true 'is_linux'; then
         unset _yesno
     fi
     
+    # Configure Conda
+    if ! is_true 'update'; then
+        log_section 'Conda Configuration'
+        
+        # Use mirror for Conda
+        if is_true 'use_mirror'; then
+            log_info 'Use TUNA mirror for Conda.'
+            is_dry_run || cat >"${HOME}/.condarc" <<'EOF'
+channels:
+  - defaults
+show_channel_urls: true
+default_channels:
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
+  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
+custom_channels:
+  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  msys2: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  pytorch-lts: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
+EOF
+        fi
+        
+        # Install Conda
+        log_info 'Install Conda...'
+        is_dry_run || curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-py39_4.12.0-Linux-x86_64.sh | sh -s -- -b -p "${HOME}/opt/miniconda3"
+        
+        # Install Mamba
+        log_info 'Install Mamba...'
+        if ! is_dry_run; then
+            eval "$("${HOME}/opt/miniconda3/bin/conda" shell.zsh hook)"
+            conda install mamba -n base -c conda-forge -y
+        fi
+        
+        # Install Snakemake
+        log_info 'Install Snakemake...'
+        is_dry_run || mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
+    fi
+    
+    # Configure Rust
+    if ! is_true 'update'; then
+        log_section 'Rust Configuration'
+        
+        # Connecting to crates is fast enough, so no need to use mirror
+        if is_true 'use_mirror'; then
+            log_info 'Rust does not need to use mirror.'
+        fi
+        
+        # Install Rust
+        log_info 'Install Rust...'
+        is_dry_run || curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
+        
+        # Install rust-script
+        log_info 'Install rust-script...'
+        if ! is_dry_run; then
+            source "${HOME}/.cargo/env"
+            cargo install rust-script
+        fi
+    fi
+    
     # Set up dotfiles beforehand
     log_section 'Dotfiles Setup'
     put_dotfile 'Aria2' "$(preprocess_file "${aria2}")" "${HOME}/.config/aria2/aria2.conf"
@@ -746,12 +839,12 @@ if is_true 'is_linux'; then
     put_dotfile 'htop' "$(preprocess_file "${htoprc}")" "${HOME}/.config/htop/htoprc"
     put_dotfile 'login' "$(preprocess_file "${hushlogin}")" "${HOME}/.hushlogin"
     put_dotfile 'Powerlevel10k' "$(preprocess_file "${p10k}")" "${HOME}/.config/powerlevel10k/p10k.zsh"
-    put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.wgetrc"
+    put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.config/wget/wgetrc"
     put_dotfile 'Zsh' "$(preprocess_file "${zshrc}")" "${HOME}/.zshrc"
     
     # Reminders for Linux
+    reminders+=('')
     source "$(preprocess_file "${linux_reminders}")"
-    
 # Configure for macOS
 elif is_true 'is_macos'; then
     # Create emoty folders
@@ -807,7 +900,7 @@ elif is_true 'is_macos'; then
     if ! is_true 'update'; then
         log_section 'Homebrew Configuration'
         
-        # Set mirror for Homebrew
+        # Use mirror for Homebrew
         if is_true 'use_mirror'; then
             log_info 'Use TUNA mirror for Homebrew.'
             export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
@@ -856,6 +949,10 @@ elif is_true 'is_macos'; then
         
         # Change the login shell to Zsh
         if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then
+            if [[ ! "$(</etc/shells)" =~ "$(command -v zsh)" ]]; then
+                log_info "Add Zsh to /etc/shells."
+                is_dry_run || sudo bash -c 'command -v zsh >>/etc/shells'
+            fi
             log_info 'Change the login shell to Zsh.'
             is_dry_run || chsh -s "$(command -v zsh)"
         fi
@@ -900,7 +997,7 @@ elif is_true 'is_macos'; then
         
         # Set up passage store
         log_info "Extract passage store to ${HOME}/.passage/store..."
-        is_dry_run || bash "${crypto}" -p "$(which age)" -d -i "${identity_file}" <<<"$(<"${passage_store}") ${passphrase}" | base64 -d | tar -xzC "${HOME}/.passage"
+        is_dry_run || bash "${crypto}" -p "$(command -v age)" -d -i "${identity_file}" <<<"$(<"${passage_archive}") ${passphrase}" | base64 -d | tar -xzC "${HOME}/.passage"
         
         # Move the identity file
         if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then
@@ -930,11 +1027,18 @@ elif is_true 'is_macos'; then
     
     # Only if the identity file is present
     if is_true 'has_identity'; then
-        put_dotfile 'SSH' "$(preprocess_file "${ssh_config}")" "${HOME}/.ssh/config"
+        # Set up SSH
+        log_info "Put SSH dotfiles to ${HOME}/.ssh."
+        is_dry_run || bash "${crypto}" -p "$(command -v age)" -d -i "${identity_file}" <<<"$(<"${ssh_archive}") ${passphrase}" | base64 -d | tar -xzC "${HOME}"
+        
+        # Set up Clash
+        log_info "Put Clash dotfiles to ${HOME}/.config/clash."
+        is_dry_run || bash "${crypto}" -p "$(command -v age)" -d -i "${identity_file}" <<<"$(<"${clash_archive}") ${passphrase}" | base64 -d | tar -xzC "${HOME}/.config"
+        
+        # Reminders for macOS
+        reminders+=('')
+        source "$(preprocess_file "${macos_reminders}")"
     fi
-    
-    # Reminders for macOS
-    source "$(preprocess_file "${macos_reminders}")"
 fi
 
 # Report
@@ -961,7 +1065,7 @@ clean_up
 prompt_continue 'About to reload the shell.'
 log_info
 if is_true 'can_sudo'; then
-    exec sudo --login --user "${USER}" bash -c "cd '${PWD}'; exec '${SHELL}' -l"
+    exec sudo --login --user "${USER}" bash -c "cd '${PWD}'; exec '$(readlink -f "$(command -v zsh)")' -l"
 else
-    exec "${SHELL}" -l
+    exec "$(readlink -f "$(command -v zsh)")" -l
 fi

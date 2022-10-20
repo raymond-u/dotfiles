@@ -18,9 +18,6 @@ osascript -e 'tell application "System Preferences" to quit'
 # sudo scutil --set LocalHostName ""
 # sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string ""
 
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
-
 # Expand save panel by default
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode -bool true
 defaults write NSGlobalDomain NSNavPanelExpandedStateForSaveMode2 -bool true
@@ -50,11 +47,6 @@ defaults write com.apple.helpviewer DevMode -bool true
 ###############################################################################
 # Trackpad, mouse, keyboard                                                   #
 ###############################################################################
-
-# Trackpad: enable tap to click for this user and for the login screen
-defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
-defaults -currentHost write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
-defaults write NSGlobalDomain com.apple.mouse.tapBehavior -int 1
 
 # Always enable key repeats
 defaults write NSGlobalDomain ApplePressAndHoldEnabled -bool false
