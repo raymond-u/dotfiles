@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.2.0'
+version='0.2.1'
 
 # Scripts
 crypto=src/crypto.sh
@@ -24,6 +24,7 @@ set_defaults=src/macos/set_defaults.sh
 aria2=src/aria2/aria2.conf
 brewfile=src/homebrew/Brewfile
 clash_archive=src/clash/archive.age
+direnvrc=src/direnv/direnvrc
 gitconfig=src/git/.gitconfig
 gitignore=src/git/gitignore
 htoprc=src/htop/htoprc
@@ -34,6 +35,7 @@ passage_archive=src/passage/archive.age
 ssh_archive=src/ssh/archive.age
 wezterm=src/wezterm/wezterm.lua
 wgetrc=src/wget/wgetrc
+zshenv=src/zsh/.zshenv
 zshrc=src/zsh/.zshrc
 
 # Package list
@@ -55,6 +57,7 @@ brew_pkgs=(
     '  fd'
     '  fzf'
     '  ripgrep'
+    '  tree'
     '  zoxide'
     ''
     '# System utilities'
@@ -63,14 +66,14 @@ brew_pkgs=(
     '  ncdu'
     '  neofetch'
     '  procs'
-    '  thefuck'
-    '  tldr'
-    '  tree'
     ''
     '# General utilities'
     '  age'
+    '  direnv'
     '  pandoc'
     '  rename'
+    '  thefuck'
+    '  tldr'
     ''
     '# Text editors'
     '  nano'
@@ -139,6 +142,7 @@ nix_pkgs=(
     '  fd'
     '  fzf'
     '  ripgrep'
+    '  tree'
     '  zoxide'
     ''
     '# System utilities'
@@ -147,14 +151,14 @@ nix_pkgs=(
     '  ncdu'
     '  neofetch'
     '  procs'
-    '  thefuck'
-    '  tldr'
-    '  tree'
     ''
     '# General utilities'
     '  age'
+    '  direnv'
     '  pandoc'
     '  rename'
+    '  thefuck'
+    '  tldr'
     ''
     '# Text editors'
     '  nano'
@@ -244,7 +248,7 @@ print_help() {
     echo '  --has-identity          Can use the identity file to decrypt secrets.'
     echo '  --identity-file         Specify the identity file.'
     echo '  --install-cask          Install GUI applications for macOS.'
-    echo '  --use-mirror            Use TUNA mirrors.'
+    echo '  --use-mirror            Use USTC mirrors.'
 }
 
 print_welcome() {
@@ -594,7 +598,7 @@ print_welcome
 is_true 'can_sudo' || prompt_yesno 'Can we use sudo?' 'y' 'can_sudo'
 
 # Propmt for use of mirrors
-is_true 'use_mirror' || prompt_yesno 'Do you wish to use TUNA mirrors?' 'n' 'use_mirror'
+is_true 'use_mirror' || prompt_yesno 'Do you wish to use USTC mirrors?' 'n' 'use_mirror'
 
 # Clone dotfiles into temp directory
 log_info 'Clone repo into a temporary directory...'
@@ -611,31 +615,8 @@ if is_true 'is_linux'; then
     if ! is_true 'update'; then
         log_section 'Nix Configuration'
         
-        # Use mirror for Nix
-        if is_true 'use_mirror'; then
-            _can_use_mirror=true
-            if [[ ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store' ]]; then
-                if is_true 'can_sudo'; then
-                    log_info 'Add TUNA mirror as a trusted substituter.'
-                    is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
-                else
-                    log_error 'Warning: TUNA mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
-                    log_error 'Abort setting mirror for Nix.'
-                    _can_use_mirror=false
-                fi
-            fi
-            if is_true '_can_use_mirror'; then
-                log_info 'Use TUNA mirror for Nix.'
-                if ! is_dry_run; then
-                    mkdir -p "${HOME}/.config/nix"
-                    echo 'substituters = https://mirrors.tuna.tsinghua.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                fi
-            fi
-            unset _can_use_mirror
-        fi
-        
         # Install Nix
-        if [[ -z "$(command -v nix-build)" ]]; then
+        if [[ -z "$(command -v nix-env)" ]]; then
             # Determine how to install Nix
             _nix_installation=
             if is_true 'can_sudo'; then
@@ -703,10 +684,38 @@ if is_true 'is_linux'; then
             esac
             unset _nix_installation
         fi
+        
+        # Use mirror for Nix
+        if is_true 'use_mirror'; then
+            _can_use_mirror=true
+            if [[ ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
+                if is_true 'can_sudo'; then
+                    log_info 'Add USTC mirror as a trusted substituter.'
+                    is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
+                else
+                    log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
+                    log_error 'Abort setting mirror for Nix.'
+                    _can_use_mirror=false
+                fi
+            fi
+            if is_true '_can_use_mirror'; then
+                log_info 'Use USTC mirror for Nix.'
+                if ! is_dry_run; then
+                    if [[ -n "$(command -v nix-channel)" ]]; then
+                        nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
+                        nix-channel --update
+                    fi
+                    mkdir -p "${HOME}/.config/nix"
+                    echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
+                    ! is_true 'can_sudo' || sudo systemctl restart nix-daemon
+                fi
+            fi
+            unset _can_use_mirror
+        fi
     fi
     
     # Install from Nix
-    if [[ -n "$(command -v nix-build)" ]]; then
+    if [[ -n "$(command -v nix-env)" ]]; then
         log_section 'Nix Packages'
         log_info "$(get_package_list)" 'yellow'
         
@@ -774,23 +783,17 @@ if is_true 'is_linux'; then
         
         # Use mirror for Conda
         if is_true 'use_mirror'; then
-            log_info 'Use TUNA mirror for Conda.'
+            log_info 'Use USTC mirror for Conda.'
             is_dry_run || cat >"${HOME}/.condarc" <<'EOF'
 channels:
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/
+  - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+  - https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
+  - https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
   - defaults
 show_channel_urls: true
-default_channels:
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/r
-  - https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/msys2
-custom_channels:
-  conda-forge: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  msys2: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  bioconda: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  menpo: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  pytorch: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  pytorch-lts: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
-  simpleitk: https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud
 EOF
         fi
         
@@ -834,6 +837,7 @@ EOF
     # Set up dotfiles beforehand
     log_section 'Dotfiles Setup'
     put_dotfile 'Aria2' "$(preprocess_file "${aria2}")" "${HOME}/.config/aria2/aria2.conf"
+    put_dotfile 'direnv' "$(preprocess_file "${direnvrc}")" "${HOME}/.config/direnv/direnvrc"
     put_dotfile 'Git' "$(preprocess_file "${gitconfig}")" "${HOME}/.gitconfig"
     put_dotfile 'Git' "$(preprocess_file "${gitignore}")" "${HOME}/.config/git/gitignore"
     put_dotfile 'htop' "$(preprocess_file "${htoprc}")" "${HOME}/.config/htop/htoprc"
@@ -841,6 +845,7 @@ EOF
     put_dotfile 'Powerlevel10k' "$(preprocess_file "${p10k}")" "${HOME}/.config/powerlevel10k/p10k.zsh"
     put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.config/wget/wgetrc"
     put_dotfile 'Zsh' "$(preprocess_file "${zshrc}")" "${HOME}/.zshrc"
+    put_dotfile 'Zsh' "$(preprocess_file "${zshenv}")" "${HOME}/.zshenv"
     
     # Reminders for Linux
     reminders+=('')
@@ -902,10 +907,10 @@ elif is_true 'is_macos'; then
         
         # Use mirror for Homebrew
         if is_true 'use_mirror'; then
-            log_info 'Use TUNA mirror for Homebrew.'
-            export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
-            export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
-            export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles
+            log_info 'Use USTC mirror for Homebrew.'
+            export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.ustc.edu.cn/brew.git
+            export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
+            export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.ustc.edu.cn/homebrew-core.git
         fi
         
         # Install Homebrew
@@ -933,6 +938,7 @@ elif is_true 'is_macos'; then
     # Install from Homebrew
     log_info 'Install packages...'
     if ! is_dry_run; then
+        ! is_true 'use_mirror' || brew tap --custom-remote --force-auto-update homebrew/cask https://mirrors.ustc.edu.cn/homebrew-cask.git
         brew bundle --file="$(preprocess_file "${brewfile}")"
         sudo ln -sfn "$(brew --prefix)/opt/openjdk/libexec/openjdk.jdk" /Library/Java/JavaVirtualMachines/openjdk.jdk
     fi
@@ -1016,6 +1022,7 @@ elif is_true 'is_macos'; then
     # Set up dotfiles
     log_section 'Dotfiles Setup'
     put_dotfile 'Aria2' "$(preprocess_file "${aria2}")" "${HOME}/.config/aria2/aria2.conf"
+    put_dotfile 'direnv' "$(preprocess_file "${direnvrc}")" "${HOME}/.config/direnv/direnvrc"
     put_dotfile 'Git' "$(preprocess_file "${gitconfig}")" "${HOME}/.gitconfig"
     put_dotfile 'Git' "$(preprocess_file "${gitignore}")" "${HOME}/.config/git/gitignore"
     put_dotfile 'htop' "$(preprocess_file "${htoprc}")" "${HOME}/.config/htop/htoprc"
@@ -1024,6 +1031,7 @@ elif is_true 'is_macos'; then
     put_dotfile 'WezTerm' "$(preprocess_file "${wezterm}")" "${HOME}/.config/wezterm/wezterm.lua"
     put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.wgetrc"
     put_dotfile 'Zsh' "$(preprocess_file "${zshrc}")" "${HOME}/.zshrc"
+    put_dotfile 'Zsh' "$(preprocess_file "${zshenv}")" "${HOME}/.zshenv"
     
     # Only if the identity file is present
     if is_true 'has_identity'; then

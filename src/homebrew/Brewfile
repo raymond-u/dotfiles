@@ -15,6 +15,7 @@ brew "exa"
 brew "fd"
 brew "fzf"
 brew "ripgrep"
+brew "tree"
 brew "zoxide"
 
 # System utilities
@@ -23,14 +24,14 @@ brew "htop"
 brew "ncdu"
 brew "neofetch"
 brew "procs"
-brew "thefuck"
-brew "tldr"
-brew "tree"
 
 # General utilities
 brew "age"
+brew "direnv"
 brew "pandoc"
 brew "rename"
+brew "thefuck"
+brew "tldr"
 
 # Text editors
 brew "nano"

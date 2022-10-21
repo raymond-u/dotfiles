@@ -11,13 +11,13 @@ in with pkgs;
     inherit coreutils gawk gnused less;
     
     # General commands
-    inherit bat exa fd fzf ripgrep zoxide;
+    inherit bat exa fd fzf ripgrep tree zoxide;
     
     # System utilities
-    inherit duf htop ncdu neofetch procs thefuck tldr tree;
+    inherit duf htop ncdu neofetch procs;
     
     # General utilities
-    inherit age pandoc rename;
+    inherit age direnv pandoc rename thefuck tldr;
     
     # Text editors
     inherit nano neovim vim;

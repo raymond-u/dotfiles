@@ -134,9 +134,9 @@ export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,ctrl-a:togg
 # [ use_mirror start ]
 # [ is_macos start ]
 # Configure Homebrew
-export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/brew.git
-export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.tuna.tsinghua.edu.cn/git/homebrew/homebrew-core.git
-export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.tuna.tsinghua.edu.cn/homebrew-bottles
+export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.ustc.edu.cn/brew.git
+export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
+export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.ustc.edu.cn/homebrew-core.git
 # [ is_macos end ]
 # [ use_mirror end ]
 
@@ -327,6 +327,9 @@ if [[ -f "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-f
     source "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
 fi
 # [ is_macos end ]
+
+# Initialize direnv
+eval "$(direnv hook zsh)"
 
 # Initialize the fuck
 eval "$(thefuck --alias fk)"
