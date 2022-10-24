@@ -199,7 +199,8 @@ alias reload='echo; exec sudo --login --user "${USER}" bash -c "cd \"${PWD}\"; e
 # [ ! can_sudo start ]
 alias reload='echo; exec "${SHELL}" -l'
 # [ ! can_sudo end ]
-alias ip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
+alias local_ip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
+alias public_ip='curl ipinfo.io/ip'
 # [ is_macos start ]
 alias hosts='nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
