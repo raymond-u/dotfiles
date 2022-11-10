@@ -1,0 +1,9 @@
+data.location=$XDG_DATA_HOME/task
+
+confirmation=0
+verbose=0
+weekstart=monday
+
+alias.burndown=burndown.daily
+search.case.sensitive=0
+urgency.user.tag.later.coefficient=-6.0

@@ -8,16 +8,16 @@ in with pkgs;
     inherit wezterm;
     
     # System commands
-    inherit coreutils gawk gnused less;
+    inherit coreutils findutils gawk gnused less p7zip;
     
     # General commands
-    inherit bat exa fd fzf ripgrep tree zoxide;
+    inherit bat exa fd fzf hexyl ripgrep tree zoxide;
     
     # System utilities
-    inherit duf htop ncdu neofetch procs;
+    inherit bottom duf htop ncdu neofetch procs;
     
     # General utilities
-    inherit age direnv pandoc rename thefuck tldr;
+    inherit age direnv hyperfine pandoc rename taskwarrior tealdeer thefuck;
     
     # Text editors
     inherit nano neovim vim;

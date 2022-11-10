@@ -4,6 +4,7 @@ brew "zsh"
 
 # System commands
 brew "coreutils"
+brew "findutils"
 brew "gawk"
 brew "gnu-getopt"
 brew "gnu-sed"
@@ -14,11 +15,13 @@ brew "bat"
 brew "exa"
 brew "fd"
 brew "fzf"
+brew "hexyl"
 brew "ripgrep"
 brew "tree"
 brew "zoxide"
 
 # System utilities
+brew "bottom"
 brew "duf"
 brew "htop"
 brew "ncdu"
@@ -28,10 +31,12 @@ brew "procs"
 # General utilities
 brew "age"
 brew "direnv"
+brew "hyperfine"
 brew "pandoc"
 brew "rename"
+brew "task"
+brew "tealdeer"
 brew "thefuck"
-brew "tldr"
 
 # Text editors
 brew "nano"

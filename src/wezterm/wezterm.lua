@@ -1,4 +1,4 @@
-local wezterm = require 'wezterm';
+local wezterm = require "wezterm";
 
 local function get_font_config(weights, italic)
     return wezterm.font_with_fallback {
@@ -218,28 +218,72 @@ return {
             action = wezterm.action.ActivateKeyTable { name = "default", one_shot = false, timeout_milliseconds = 1000 },
         },
         {
-            key = "s",
-            mods = "SUPER",
-            action = wezterm.action.QuickSelect,
+            key = "UpArrow",
+            mods = "SHIFT",
+            action = wezterm.action.ScrollToPrompt(-1),
         },
         {
-            key = "S",
-            mods = "SUPER",
-            action = wezterm.action.QuickSelect,
+            key = "DownArrow",
+            mods = "SHIFT",
+            action = wezterm.action.ScrollToPrompt(1),
+        },
+        {
+            key = "Space",
+            mods = "CTRL",
+            action = wezterm.action.ShowLauncher,
         },
     },
     key_tables = {
         default = {
+            -- Window control
             {
-                key = "Escape",
+                key = "n",
                 mods = "",
-                action = wezterm.action.PopKeyTable,
+                action = wezterm.action.SpawnWindow,
+            },
+            -- Domain control
+            {
+                key = "Backspace",
+                mods = "SHIFT",
+                action = wezterm.action.DetachDomain("CurrentPaneDomain"),
+            },
+            -- Tab control
+            {
+                key = "t",
+                mods = "",
+                action = wezterm.action.SpawnTab("CurrentPaneDomain"),
             },
             {
-                key = "`",
-                mods = "",
-                action = wezterm.action.SendKey { key = "`" },
+                key = "t",
+                mods = "SHIFT",
+                action = wezterm.action.SpawnTab("DefaultDomain"),
             },
+            {
+                key = "w",
+                mods = "",
+                action = wezterm.action.CloseCurrentTab { confirm = false },
+            },
+            {
+                key = "q",
+                mods = "",
+                action = wezterm.action.ActivateTabRelative(-1),
+            },
+            {
+                key = "e",
+                mods = "",
+                action = wezterm.action.ActivateTabRelative(1),
+            },
+            {
+                key = "a",
+                mods = "",
+                action = wezterm.action.MoveTabRelative(-1),
+            },
+            {
+                key = "d",
+                mods = "",
+                action = wezterm.action.MoveTabRelative(1),
+            },
+            -- Pane control
             {
                 key = "-",
                 mods = "",
@@ -251,87 +295,27 @@ return {
                 action = wezterm.action.SplitHorizontal { domain = "CurrentPaneDomain" },
             },
             {
-                key = "r",
-                mods = "",
-                action = wezterm.action.RotatePanes("Clockwise"),
-            },
-            {
-                key = "R",
-                mods = "",
-                action = wezterm.action.RotatePanes("Clockwise"),
-            },
-            {
-                key = "r",
-                mods = "SUPER",
-                action = wezterm.action.RotatePanes("CounterClockwise"),
-            },
-            {
-                key = "R",
-                mods = "SUPER",
-                action = wezterm.action.RotatePanes("CounterClockwise"),
-            },
-            {
                 key = "Backspace",
                 mods = "",
                 action = wezterm.action.CloseCurrentPane { confirm = false },
             },
             {
-                key = "q",
+                key = "z",
                 mods = "",
-                action = wezterm.action.ActivateTabRelative(-1),
+                action = wezterm.action.TogglePaneZoomState,
             },
             {
-                key = "Q",
+                key = "r",
                 mods = "",
-                action = wezterm.action.ActivateTabRelative(-1),
+                action = wezterm.action.RotatePanes("Clockwise"),
             },
             {
-                key = "e",
-                mods = "",
-                action = wezterm.action.ActivateTabRelative(1),
-            },
-            {
-                key = "E",
-                mods = "",
-                action = wezterm.action.ActivateTabRelative(1),
-            },
-            {
-                key = "1",
-                mods = "",
-                action = wezterm.action.MoveTabRelative(-1),
-            },
-            {
-                key = "3",
-                mods = "",
-                action = wezterm.action.MoveTabRelative(1),
-            },
-            {
-                key = "t",
-                mods = "",
-                action = wezterm.action.SpawnTab("CurrentPaneDomain"),
-            },
-            {
-                key = "T",
-                mods = "",
-                action = wezterm.action.SpawnTab("CurrentPaneDomain"),
-            },
-            {
-                key = "w",
-                mods = "",
-                action = wezterm.action.CloseCurrentTab { confirm = false },
-            },
-            {
-                key = "W",
-                mods = "",
-                action = wezterm.action.CloseCurrentTab { confirm = false },
+                key = "r",
+                mods = "SHIFT",
+                action = wezterm.action.RotatePanes("CounterClockwise"),
             },
             {
                 key = "h",
-                mods = "",
-                action = wezterm.action.ActivatePaneDirection("Left"),
-            },
-            {
-                key = "H",
                 mods = "",
                 action = wezterm.action.ActivatePaneDirection("Left"),
             },
@@ -341,17 +325,7 @@ return {
                 action = wezterm.action.ActivatePaneDirection("Down"),
             },
             {
-                key = "J",
-                mods = "",
-                action = wezterm.action.ActivatePaneDirection("Down"),
-            },
-            {
                 key = "k",
-                mods = "",
-                action = wezterm.action.ActivatePaneDirection("Up"),
-            },
-            {
-                key = "K",
                 mods = "",
                 action = wezterm.action.ActivatePaneDirection("Up"),
             },
@@ -360,21 +334,7 @@ return {
                 mods = "",
                 action = wezterm.action.ActivatePaneDirection("Right"),
             },
-            {
-                key = "L",
-                mods = "",
-                action = wezterm.action.ActivatePaneDirection("Right"),
-            },
-            {
-                key = "n",
-                mods = "",
-                action = wezterm.action.SpawnWindow,
-            },
-            {
-                key = "N",
-                mods = "",
-                action = wezterm.action.SpawnWindow,
-            },
+            -- Scrolling
             {
                 key = "UpArrow",
                 mods = "",
@@ -387,24 +347,57 @@ return {
             },
             {
                 key = "UpArrow",
-                mods = "SUPER",
+                mods = "SHIFT",
                 action = wezterm.action.Multiple(get_repeated_array(wezterm.action.SendKey { key = "UpArrow" }, 20)),
             },
             {
                 key = "DownArrow",
-                mods = "SUPER",
+                mods = "SHIFT",
                 action = wezterm.action.Multiple(get_repeated_array(wezterm.action.SendKey { key = "DownArrow" }, 20)),
             },
+            -- Misc
             {
-                key = "Space",
+                key = "Escape",
                 mods = "",
-                action = wezterm.action.ShowLauncher,
+                action = wezterm.action.PopKeyTable,
+            },
+            {
+                key = "`",
+                mods = "",
+                action = wezterm.action.SendKey { key = "`" },
+            },
+            {
+                key = "u",
+                mods = "",
+                action = wezterm.action.CharSelect { copy_on_select = false },
+            },
+            {
+                key = "c",
+                mods = "",
+                action = wezterm.action.QuickSelect,
+            },
+            {
+                key = "v",
+                mods = "",
+                action = wezterm.action.ActivateCopyMode,
             },
             {
                 key = "Enter",
                 mods = "",
                 action = wezterm.action.ToggleFullScreen,
             },
+        },
+    },
+    mouse_bindings = {
+        {
+            event = { Down = { streak = 4, button = "Left" } },
+            mods = "",
+            action = wezterm.action.Multiple { wezterm.action.SelectTextAtMouseCursor("SemanticZone"), wezterm.action.CopyTo("PrimarySelection") },
+        },
+        {
+            event = { Down = { streak = 1, button = "Right" } },
+            mods = "",
+            action = wezterm.action.PasteFrom("Clipboard"),
         },
     },
     

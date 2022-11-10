@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.2.1'
+version='0.3.0'
 
 # Scripts
 crypto=src/crypto.sh
@@ -22,17 +22,19 @@ set_defaults=src/macos/set_defaults.sh
 
 # Config files
 aria2=src/aria2/aria2.conf
+bottom=src/bottom/bottom.toml
 brewfile=src/homebrew/Brewfile
 clash_archive=src/clash/archive.age
 direnvrc=src/direnv/direnvrc
-gitconfig=src/git/.gitconfig
-gitignore=src/git/gitignore
+gitconfig=src/git/config
+gitignore=src/git/ignore
 htoprc=src/htop/htoprc
 hushlogin=src/misc/.hushlogin
 nix_env=src/nix/env.nix
 p10k=src/powerlevel10k/p10k.zsh
 passage_archive=src/passage/archive.age
 ssh_archive=src/ssh/archive.age
+taskrc=src/taskwarrior/taskrc
 wezterm=src/wezterm/wezterm.lua
 wgetrc=src/wget/wgetrc
 zshenv=src/zsh/.zshenv
@@ -46,6 +48,7 @@ brew_pkgs=(
     ''
     '# System commands'
     '  coreutils'
+    '  findutils'
     '  gawk'
     '  gnu-getopt'
     '  gnu-sed'
@@ -56,11 +59,13 @@ brew_pkgs=(
     '  exa'
     '  fd'
     '  fzf'
+    '  hexyl'
     '  ripgrep'
     '  tree'
     '  zoxide'
     ''
     '# System utilities'
+    '  bottom'
     '  duf'
     '  htop'
     '  ncdu'
@@ -70,10 +75,12 @@ brew_pkgs=(
     '# General utilities'
     '  age'
     '  direnv'
+    '  hyperfine'
     '  pandoc'
     '  rename'
+    '  task'
+    '  tealdeer'
     '  thefuck'
-    '  tldr'
     ''
     '# Text editors'
     '  nano'
@@ -132,20 +139,24 @@ nix_pkgs=(
     ''
     '# System commands'
     '  coreutils'
+    '  findutils'
     '  gawk'
     '  gnu-sed'
     '  less'
+    '  p7zip'
     ''
     '# General commands'
     '  bat'
     '  exa'
     '  fd'
     '  fzf'
+    '  hexyl'
     '  ripgrep'
     '  tree'
     '  zoxide'
     ''
     '# System utilities'
+    '  bottom'
     '  duf'
     '  htop'
     '  ncdu'
@@ -155,10 +166,12 @@ nix_pkgs=(
     '# General utilities'
     '  age'
     '  direnv'
+    '  hyperfine'
     '  pandoc'
     '  rename'
+    '  taskwarrior'
+    '  tealdeer'
     '  thefuck'
-    '  tldr'
     ''
     '# Text editors'
     '  nano'
@@ -252,9 +265,9 @@ print_help() {
 }
 
 print_welcome() {
-    if is_true 'update'; then
+    if is_true update; then
         log_info 'Update home environment...'
-        return 0
+        return
     fi
     
     echo "${cyan}"
@@ -279,7 +292,7 @@ ______                                      _ _
 EOF
     echo "Welcome! This script will install Raymond's home environment on your machine."
     
-    if is_true 'dry_run'; then
+    if is_true dry_run; then
         echo 'We are in dry run mode. Nothing will be changed.'
     else
         echo 'It has a dry run mode "-n/--dry-run", in case you are afraid of breaking things.'
@@ -287,11 +300,11 @@ EOF
     
     echo
     
-    if is_true 'is_linux'; then
+    if is_true is_linux; then
         echo 'Linux detected. Nix will be used as the universal package manager.'
-    elif is_true 'is_macos_arm64'; then
+    elif is_true is_macos_arm64; then
         echo 'macOS arm64 detected. Homebrew will be used as the package manager.'
-    elif is_true 'is_macos'; then
+    elif is_true is_macos; then
         echo 'macOS detected. Homebrew will be used as the package manager.'
     fi
     
@@ -354,7 +367,7 @@ prompt_yesno() {
 }
 
 is_dry_run() {
-    if ! is_true 'dry_run'; then
+    if ! is_true dry_run; then
         return 1
     fi
     
@@ -373,10 +386,10 @@ join_by_newline() {
 }
 
 get_package_list() {
-    if is_true 'is_linux'; then
+    if is_true is_linux; then
         printf '%s' "$(join_by_newline "${nix_pkgs[@]}")"
-    elif is_true 'is_macos'; then
-        if is_true 'install_cask'; then
+    elif is_true is_macos; then
+        if is_true install_cask; then
             printf '%s' "$(join_by_newline "${brew_pkgs[@]}")" $'\n\n----- GUI Applications -----\n\n' "$(join_by_newline "${cask_pkgs[@]}")"
         else
             printf '%s' "$(join_by_newline "${brew_pkgs[@]}")"
@@ -397,7 +410,7 @@ preprocess_file() {
         '--version' "${version}"
     )
     
-    if is_true 'has_identity'; then
+    if is_true has_identity; then
         bash "${preprocess}" -i "${tmpdir}/dotfiles/$1" -o "${tmpdir}/dotfiles/$1.pd" -s "${crypto}" -p "$(command -v age)" -f "${identity_file}" "${pairs[@]}" "${flags[@]}" <<<"${passphrase}"
     else
         bash "${preprocess}" -i "${tmpdir}/dotfiles/$1" -o "${tmpdir}/dotfiles/$1.pd" "${pairs[@]}" "${flags[@]}"
@@ -410,7 +423,7 @@ put_dotfile() {
     log_info "Put $1 dotfile to $3."
     if ! is_dry_run; then
         if [[ -f "$3" ]]; then
-            if ! is_true 'update'; then
+            if ! is_true update; then
                 log_info "$1 dotfile already exists. Rename it to $3.old."
                 reminders+=("$1: Old dotfile lingers in $3.old.")
                 mv "$3" "$3.old"
@@ -419,7 +432,7 @@ put_dotfile() {
             mkdir -p "$(dirname "$3")"
         fi
         
-        cp "$2" "$3"
+        cp "$(preprocess_file "$2")" "$3"
     fi
 }
 
@@ -556,7 +569,7 @@ if (( os_flags_counter == 0 )); then
 fi
 
 # Check the identity file
-if is_true 'identity_file'; then
+if is_true identity_file; then
     if [[ ! -f "${identity_file}" ]]; then
         log_error 'Error: The identity file does not exist.'
         exit 0
@@ -567,9 +580,9 @@ fi
 
 # Check prerequisites
 _prerequisites=()
-if is_true 'is_linux'; then
+if is_true is_linux; then
     _prerequisites=('chmod' 'curl' 'dirname' 'git' 'ls' 'mkdir' 'mktemp' 'mv' 'readlink' 'uname')
-elif is_true 'is_macos'; then
+elif is_true is_macos; then
     _prerequisites=('base64' 'curl' 'dirname' 'expect' 'git' 'ls' 'make' 'mkdir' 'mktemp' 'mv' 'perl' 'tar' 'uname')
 fi
 for _program in "${_prerequisites[@]}"; do
@@ -582,23 +595,23 @@ unset _prerequisites
 unset _program
 
 # Redirect output
-log_file="$(is_true 'update' && echo "${PWD}/update.log" || echo "${PWD}/install.log")"
+log_file="$(is_true update && echo "${PWD}/update.log" || echo "${PWD}/install.log")"
 exec 3>&1 4>&2 &> >(tee "${log_file}")
 
 # Create temporary directory
 tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t 'tmp')"
 
-# Intercept INT signal
-trap clean_up INT
+# Intercept signals
+trap clean_up ERR INT TERM
 
 # Print welcome messages
 print_welcome
 
 # Prompt for use of sudo
-is_true 'can_sudo' || prompt_yesno 'Can we use sudo?' 'y' 'can_sudo'
+is_true can_sudo || prompt_yesno 'Can we use sudo?' 'y' can_sudo
 
 # Propmt for use of mirrors
-is_true 'use_mirror' || prompt_yesno 'Do you wish to use USTC mirrors?' 'n' 'use_mirror'
+is_true use_mirror || prompt_yesno 'Do you wish to use USTC mirrors?' 'n' use_mirror
 
 # Clone dotfiles into temp directory
 log_info 'Clone repo into a temporary directory...'
@@ -606,20 +619,20 @@ git clone --depth=1 --quiet "${repo}" "${tmpdir}/dotfiles"
 pushd "${tmpdir}/dotfiles" >/dev/null
 
 # Configure for Linux
-if is_true 'is_linux'; then
+if is_true is_linux; then
     # Create empty folders
     log_info 'Create empty folders in the home directory...'
-    is_dry_run || mkdir -p "${HOME}/bin" "${HOME}/downloads" "${HOME}/opt" "${HOME}/playground"
+    is_dry_run || mkdir -p "${HOME}/"{bin,downloads,opt,playground} "${HOME}/.local/state/"{less,zsh}
     
     # Configure Nix
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Nix Configuration'
         
         # Install Nix
         if [[ -z "$(command -v nix-env)" ]]; then
             # Determine how to install Nix
             _nix_installation=
-            if is_true 'can_sudo'; then
+            if is_true can_sudo; then
                 # Check if SELinux has been disabled
                 ! selinuxenabled 2>/dev/null || sudo setenforce 'Permissive'
                 _nix_installation='multi-user'
@@ -686,10 +699,10 @@ if is_true 'is_linux'; then
         fi
         
         # Use mirror for Nix
-        if is_true 'use_mirror'; then
+        if is_true use_mirror; then
             _can_use_mirror=true
             if [[ ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
-                if is_true 'can_sudo'; then
+                if is_true can_sudo; then
                     log_info 'Add USTC mirror as a trusted substituter.'
                     is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
                 else
@@ -698,7 +711,7 @@ if is_true 'is_linux'; then
                     _can_use_mirror=false
                 fi
             fi
-            if is_true '_can_use_mirror'; then
+            if is_true _can_use_mirror; then
                 log_info 'Use USTC mirror for Nix.'
                 if ! is_dry_run; then
                     if [[ -n "$(command -v nix-channel)" ]]; then
@@ -707,7 +720,7 @@ if is_true 'is_linux'; then
                     fi
                     mkdir -p "${HOME}/.config/nix"
                     echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                    ! is_true 'can_sudo' || sudo systemctl restart nix-daemon
+                    ! is_true can_sudo || sudo systemctl restart nix-daemon
                 fi
             fi
             unset _can_use_mirror
@@ -717,7 +730,7 @@ if is_true 'is_linux'; then
     # Install from Nix
     if [[ -n "$(command -v nix-env)" ]]; then
         log_section 'Nix Packages'
-        log_info "$(get_package_list)" 'yellow'
+        log_info "$(get_package_list)" yellow
         
         # Prompt for confirmation of package installation
         prompt_continue 'About to install the above packages from Nix.'
@@ -726,12 +739,12 @@ if is_true 'is_linux'; then
     fi
     
     # Configure Zsh
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Zsh Configuration'
         
         # Install Zinit
         log_info 'Install Zinit...'
-        is_dry_run || bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+        is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
         reminders+=('Zinit: Zinit will self-update when the shell reloads.')
         reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
         
@@ -739,7 +752,7 @@ if is_true 'is_linux'; then
         if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then
             _can_use_zsh=true
             if [[ ! "$(</etc/shells)" =~ "$(readlink -f "$(command -v zsh)")" ]]; then
-                if is_true 'can_sudo'; then
+                if is_true can_sudo; then
                     log_info "Add Zsh to /etc/shells."
                     is_dry_run || sudo bash -c 'readlink -f "$1" >>/etc/shells' -s "$(command -v zsh)"
                 else
@@ -748,7 +761,7 @@ if is_true 'is_linux'; then
                     _can_use_zsh=false
                 fi
             fi
-            if is_true '_can_use_zsh'; then
+            if is_true _can_use_zsh; then
                 log_info 'Change the login shell to Zsh.'
                 is_dry_run || chsh -s "$(readlink -f "$(command -v zsh)")"
             fi
@@ -756,18 +769,29 @@ if is_true 'is_linux'; then
         fi
     fi
     
+    # Configure WezTerm
+    log_info 'Set up shell integration for WezTerm.'
+    if ! is_dry_run; then
+        mkdir -p "${HOME}/.config/wezterm"
+        curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
+    fi
+    
+    # Configure tealdeer
+    log_info 'Fetch caches for tealdeer.'
+    is_dry_run || tldr -u
+    
     # Configure Neovim
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Neovim Configuration'
         _yesno=true
         
         # Check if config files already exist
         if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-            prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' '_yesno'
+            prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' _yesno
         fi
         
         # Install NvChad
-        if is_true '_yesno'; then
+        if is_true _yesno; then
             if ! is_dry_run; then
                 rm -rf "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
                 git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
@@ -778,11 +802,11 @@ if is_true 'is_linux'; then
     fi
     
     # Configure Conda
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Conda Configuration'
         
         # Use mirror for Conda
-        if is_true 'use_mirror'; then
+        if is_true use_mirror; then
             log_info 'Use USTC mirror for Conda.'
             is_dry_run || cat >"${HOME}/.condarc" <<'EOF'
 channels:
@@ -814,56 +838,60 @@ EOF
     fi
     
     # Configure Rust
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Rust Configuration'
         
         # Connecting to crates is fast enough, so no need to use mirror
-        if is_true 'use_mirror'; then
+        if is_true use_mirror; then
             log_info 'Rust does not need to use mirror.'
         fi
         
         # Install Rust
         log_info 'Install Rust...'
-        is_dry_run || curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
+        if ! is_dry_run; then
+            curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
+            source "${HOME}/.cargo/env"
+            rustup default stable
+        fi
         
         # Install rust-script
         log_info 'Install rust-script...'
-        if ! is_dry_run; then
-            source "${HOME}/.cargo/env"
-            cargo install rust-script
-        fi
+        is_dry_run || cargo install rust-script
     fi
     
     # Set up dotfiles beforehand
     log_section 'Dotfiles Setup'
-    put_dotfile 'Aria2' "$(preprocess_file "${aria2}")" "${HOME}/.config/aria2/aria2.conf"
-    put_dotfile 'direnv' "$(preprocess_file "${direnvrc}")" "${HOME}/.config/direnv/direnvrc"
-    put_dotfile 'Git' "$(preprocess_file "${gitconfig}")" "${HOME}/.gitconfig"
-    put_dotfile 'Git' "$(preprocess_file "${gitignore}")" "${HOME}/.config/git/gitignore"
-    put_dotfile 'htop' "$(preprocess_file "${htoprc}")" "${HOME}/.config/htop/htoprc"
-    put_dotfile 'login' "$(preprocess_file "${hushlogin}")" "${HOME}/.hushlogin"
-    put_dotfile 'Powerlevel10k' "$(preprocess_file "${p10k}")" "${HOME}/.config/powerlevel10k/p10k.zsh"
-    put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.config/wget/wgetrc"
-    put_dotfile 'Zsh' "$(preprocess_file "${zshrc}")" "${HOME}/.zshrc"
-    put_dotfile 'Zsh' "$(preprocess_file "${zshenv}")" "${HOME}/.zshenv"
+    put_dotfile 'Aria2' "${aria2}" "${HOME}/.config/aria2/aria2.conf"
+    put_dotfile 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
+    put_dotfile 'direnv' "${direnvrc}" "${HOME}/.config/direnv/direnvrc"
+    put_dotfile 'Git' "${gitconfig}" "${HOME}/.config/git/config"
+    put_dotfile 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
+    put_dotfile 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"
+    put_dotfile 'login' "${hushlogin}" "${HOME}/.hushlogin"
+    put_dotfile 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
+    put_dotfile 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
+    put_dotfile 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
+    put_dotfile 'Zsh' "${zshrc}" "${HOME}/.zshrc"
+    put_dotfile 'Zsh' "${zshenv}" "${HOME}/.zshenv"
     
     # Reminders for Linux
     reminders+=('')
     source "$(preprocess_file "${linux_reminders}")"
+
 # Configure for macOS
-elif is_true 'is_macos'; then
-    # Create emoty folders
+elif is_true is_macos; then
+    # Create empty folders
     log_info 'Create empty folders in the home directory...'
-    is_dry_run || mkdir -p "${HOME}/.local/bin" "${HOME}/Playground" "${HOME}/Projects/visual_studio_code"
+    is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/Playground" "${HOME}/Projects/visual_studio_code" "${HOME}/.local/state/"{less,zsh}
     
     # Prompt for the identity file
-    is_true 'has_identity' || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' 'has_identity'
-    if is_true 'has_identity' && ! is_true 'identity_file'; then
+    is_true has_identity || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity
+    if is_true has_identity && ! is_true identity_file; then
         if [[ -f "${HOME}/.passage/identities" ]]; then
             prompt_continue "Use the identity file located at ${HOME}/.passage/identities."
             identity_file="${HOME}/.passage/identities"
         else
-            prompt_string 'Please enter the path to the identity file.' 'identity_file'
+            prompt_string 'Please enter the path to the identity file.' identity_file
             [[ -f "${identity_file}" ]] || has_identity=false
         fi
     fi
@@ -878,10 +906,10 @@ elif is_true 'is_macos'; then
     fi
     
     # Prompt for the passphrase
-    ! is_true 'has_identity' || prompt_passphrase "Please enter the passphrase of the identity file. (If there isn't one, just hit enter.)" 'passphrase'
+    ! is_true has_identity || prompt_passphrase "Please enter the passphrase of the identity file. (If there isn't one, just hit enter.)" passphrase
     
     # Configure macOS
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'macOS Configuration'
         log_info 'Configure general UI/UX...'
         log_info 'Configure trackpad, mouse and keyboard...'
@@ -902,11 +930,11 @@ elif is_true 'is_macos'; then
     fi
     
     # Configure Homebrew
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Homebrew Configuration'
         
         # Use mirror for Homebrew
-        if is_true 'use_mirror'; then
+        if is_true use_mirror; then
             log_info 'Use USTC mirror for Homebrew.'
             export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.ustc.edu.cn/brew.git
             export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
@@ -918,7 +946,7 @@ elif is_true 'is_macos'; then
         is_dry_run || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         
         # One extra step required for Apple Silicon machines
-        if is_true 'is_macos_arm64'; then
+        if is_true is_macos_arm64; then
             is_dry_run || eval "$(/opt/homebrew/bin/brew shellenv)"
         fi
         
@@ -929,27 +957,27 @@ elif is_true 'is_macos'; then
     
     # Prompt for installation of GUI applications
     log_section 'Homebrew Packges'
-    is_true 'install_cask' || prompt_yesno 'Do you wish to install GUI applications from Homebrew Cask?' 'y' 'install_cask'
+    is_true install_cask || prompt_yesno 'Do you wish to install GUI applications from Homebrew Cask?' 'y' install_cask
     
     # Prompt for confirmation of package installation
-    log_info "$(get_package_list)" 'yellow'
+    log_info "$(get_package_list)" yellow
     prompt_continue 'About to install the above packages from Homebrew.'
     
     # Install from Homebrew
     log_info 'Install packages...'
     if ! is_dry_run; then
-        ! is_true 'use_mirror' || brew tap --custom-remote --force-auto-update homebrew/cask https://mirrors.ustc.edu.cn/homebrew-cask.git
+        ! is_true use_mirror || brew tap --custom-remote --force-auto-update homebrew/cask https://mirrors.ustc.edu.cn/homebrew-cask.git
         brew bundle --file="$(preprocess_file "${brewfile}")"
         sudo ln -sfn "$(brew --prefix)/opt/openjdk/libexec/openjdk.jdk" /Library/Java/JavaVirtualMachines/openjdk.jdk
     fi
     
     # Configure Zsh
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Zsh Configuration'
         
         # Install Zinit
         log_info 'Install Zinit...'
-        is_dry_run || bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
+        is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
         reminders+=('Zinit: Zinit will self-update when the shell reloads.')
         reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
         
@@ -964,18 +992,29 @@ elif is_true 'is_macos'; then
         fi
     fi
     
+    # Configure WezTerm
+    log_info 'Set up shell integration for WezTerm.'
+    if ! is_dry_run; then
+        mkdir -p "${HOME}/.config/wezterm"
+        curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
+    fi
+    
+    # Configure tealdeer
+    log_info 'Fetch caches for tealdeer.'
+    is_dry_run || tldr -u
+    
     # Configure Neovim
-    if ! is_true 'update'; then
+    if ! is_true update; then
         log_section 'Neovim Configuration'
         _yesno=true
         
         # Check if config files already exist
         if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-            prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' '_yesno'
+            prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' _yesno
         fi
         
         # Install NvChad
-        if is_true '_yesno'; then
+        if is_true _yesno; then
             if ! is_dry_run; then
                 rm -rf "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
                 git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
@@ -986,17 +1025,17 @@ elif is_true 'is_macos'; then
     fi
     
     # Configure passage
-    if is_true 'has_identity'; then
+    if is_true has_identity; then
         log_section 'Passage Setup'
         
         # Install passage
-        if ! is_true 'update'; then
+        if ! is_true update; then
             log_info 'Install passage...'
             git clone --depth=1 --quiet https://github.com/FiloSottile/passage "${tmpdir}/passage"
             if ! is_dry_run; then
                 pushd "${tmpdir}/passage" >/dev/null
-                make "PREFIX=${HOME}/.passage/passage" install
-                ln -sf "${HOME}/.passage/passage/bin/passage" "${HOME}/.local/bin"
+                make "PREFIX=${HOME}/.local/opt/passage" install
+                ln -sf "${HOME}/.local/opt/passage/bin/passage" "${HOME}/.local/bin"
                 popd >/dev/null
             fi
         fi
@@ -1007,8 +1046,8 @@ elif is_true 'is_macos'; then
         
         # Move the identity file
         if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then
-            prompt_yesno "Do you wish to move the identity file to ${HOME}/.passage/identities?" 'y' '_yesno'
-            if is_true '_yesno'; then
+            prompt_yesno "Do you wish to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
+            if is_true _yesno; then
                 log_info "Move the identity file to ${HOME}/.passage/identities."
                 if ! is_dry_run; then
                     mv "${identity_file}" "${HOME}/.passage/identities"
@@ -1021,20 +1060,22 @@ elif is_true 'is_macos'; then
     
     # Set up dotfiles
     log_section 'Dotfiles Setup'
-    put_dotfile 'Aria2' "$(preprocess_file "${aria2}")" "${HOME}/.config/aria2/aria2.conf"
-    put_dotfile 'direnv' "$(preprocess_file "${direnvrc}")" "${HOME}/.config/direnv/direnvrc"
-    put_dotfile 'Git' "$(preprocess_file "${gitconfig}")" "${HOME}/.gitconfig"
-    put_dotfile 'Git' "$(preprocess_file "${gitignore}")" "${HOME}/.config/git/gitignore"
-    put_dotfile 'htop' "$(preprocess_file "${htoprc}")" "${HOME}/.config/htop/htoprc"
-    put_dotfile 'login' "$(preprocess_file "${hushlogin}")" "${HOME}/.hushlogin"
-    put_dotfile 'Powerlevel10k' "$(preprocess_file "${p10k}")" "${HOME}/.config/powerlevel10k/p10k.zsh"
-    put_dotfile 'WezTerm' "$(preprocess_file "${wezterm}")" "${HOME}/.config/wezterm/wezterm.lua"
-    put_dotfile 'Wget' "$(preprocess_file "${wgetrc}")" "${HOME}/.wgetrc"
-    put_dotfile 'Zsh' "$(preprocess_file "${zshrc}")" "${HOME}/.zshrc"
-    put_dotfile 'Zsh' "$(preprocess_file "${zshenv}")" "${HOME}/.zshenv"
+    put_dotfile 'Aria2' "${aria2}" "${HOME}/.config/aria2/aria2.conf"
+    put_dotfile 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
+    put_dotfile 'direnv' "${direnvrc}" "${HOME}/.config/direnv/direnvrc"
+    put_dotfile 'Git' "${gitconfig}" "${HOME}/.config/git/config"
+    put_dotfile 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
+    put_dotfile 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"
+    put_dotfile 'login' "${hushlogin}" "${HOME}/.hushlogin"
+    put_dotfile 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
+    put_dotfile 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
+    put_dotfile 'WezTerm' "${wezterm}" "${HOME}/.config/wezterm/wezterm.lua"
+    put_dotfile 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
+    put_dotfile 'Zsh' "${zshrc}" "${HOME}/.zshrc"
+    put_dotfile 'Zsh' "${zshenv}" "${HOME}/.zshenv"
     
     # Only if the identity file is present
-    if is_true 'has_identity'; then
+    if is_true has_identity; then
         # Set up SSH
         log_info "Put SSH dotfiles to ${HOME}/.ssh."
         is_dry_run || bash "${crypto}" -p "$(command -v age)" -d -i "${identity_file}" <<<"$(<"${ssh_archive}") ${passphrase}" | base64 -d | tar -xzC "${HOME}"
@@ -1054,15 +1095,15 @@ log_section 'Final Report'
 
 # Print reminders
 if (( ${#reminders[@]} > 0 )); then
-    log_info 'Almost done. A few reminders:' 'yellow'
+    log_info 'Almost done. A few reminders:' yellow
     for _reminder in "${reminders[@]}"; do
-        log_info "${_reminder}" 'yellow'
+        log_info "${_reminder}" yellow
     done
 else
     log_info 'Done.'
 fi
 unset _reminder
-log_info
+echo
 log_info "Complete log has been saved to ${log_file}."
 log_info 'You can use "home-env" command to keep home environment up-to-date.'
 
@@ -1071,9 +1112,5 @@ clean_up
 
 # Reload the shell
 prompt_continue 'About to reload the shell.'
-log_info
-if is_true 'can_sudo'; then
-    exec sudo --login --user "${USER}" bash -c "cd '${PWD}'; exec '$(readlink -f "$(command -v zsh)")' -l"
-else
-    exec "$(readlink -f "$(command -v zsh)")" -l
-fi
+echo
+is_true can_sudo && exec sudo -i -u "${USER}" bash -c "cd '${PWD}'; exec '$(command -v zsh)' -l" || exec "$(command -v zsh)" -l

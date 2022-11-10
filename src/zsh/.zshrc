@@ -98,24 +98,26 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # [ is_macos_arm64 end ]
 
 # Set general envs
-export HISTFILE="${HOME}/.zsh_history"
-export HISTSIZE=10000
-export SAVEHIST=10000
 export XDG_CACHE_HOME="${HOME}/.cache"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_DATA_HOME="${HOME}/.local/share"
 export XDG_STATE_HOME="${HOME}/.local/state"
-export EDITOR='nvim'
-export VISUAL='nvim'
 # [ is_linux start ]
 export PATH="${HOME}/bin${PATH:+:${PATH}}"
 # [ is_linux end ]
 # [ is_macos start ]
-export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
+export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/findutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
 # [ is_macos end ]
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+# Configure shell history
+export HISTSIZE=10000
+export SAVEHIST=10000
+export HISTFILE="${HOME}/.local/state/zsh/history"
 
 # [ is_linux start ]
-# Configure completions for Nix
+# Configure completions for Nix packages
 for profile in ''${(z)NIX_PROFILES}; do
     fpath+=(
         "${profile}/share/zsh/site-functions"
@@ -125,6 +127,7 @@ for profile in ''${(z)NIX_PROFILES}; do
 done
 # [ is_linux end ]
 # [ is_macos_arm64 start ]
+# Configure completions for Homebrew packages
 fpath+=("$(brew --prefix)/share/zsh/site-functions")
 # [ is_macos_arm64 end ]
 
@@ -140,21 +143,30 @@ export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.ustc.edu.cn/homebrew-core.git
 # [ is_macos end ]
 # [ use_mirror end ]
 
+# [ is_macos start ]
+# Configure Java
+export JAVA_HOME="$(brew --prefix)/opt/openjdk"
+# [ is_macos end ]
+
 # Configure less
 export LESS='-R -i --wheel-lines=3'
+export LESSHISTFILE="${HOME}/.local/state/less/history"
 
 # Configure man
 export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
 export MANROFFOPT='-c'
+
+# Configure taskwarrior
+export TASKRC="${HOME}/.config/task/taskrc"
 
 # Configure wget
 export WGETRC="${HOME}/.config/wget/wgetrc"
 
 # [ is_linux start ]
 # Uncomment this if locale of nix packages was broken
-# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link "<nixpkgs>" -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE="/usr/bin/locale"
+# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link '<nixpkgs>' -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link '<nixpkgs>' -A glibcLocales)/lib/locale/locale-archive"
+# export LOCALE_ARCHIVE=/usr/bin/locale
 # [ is_linux end ]
 
 # Aliases for system commands
@@ -162,7 +174,7 @@ alias c='cat'
 alias cat='bat --pager "less -RXFe"'
 alias d='wget'
 alias e='nvim'
-alias find='fd'
+alias fd='fd -HI'
 alias grep='rg'
 alias l='ls'
 alias la='ls -la'
@@ -175,6 +187,7 @@ alias mkdir='mkdir -p'
 alias quit='exit'
 alias rl='readlink -f'
 alias rp='realpath'
+alias xxd='hexyl'
 
 # Aliases for user commands
 # [ is_linux start ]
@@ -194,7 +207,7 @@ alias pass='passage'
 alias bashrc='nvim "${HOME}/.bashrc"'
 alias zshrc='nvim "${HOME}/.zshrc"'
 # [ can_sudo start ]
-alias reload='echo; exec sudo --login --user "${USER}" bash -c "cd \"${PWD}\"; exec \"${SHELL}\" -l"'
+alias reload='echo; exec sudo -i -u "${USER}" bash -c "cd \"${PWD}\"; exec \"${SHELL}\" -l"'
 # [ can_sudo end ]
 # [ ! can_sudo start ]
 alias reload='echo; exec "${SHELL}" -l'
@@ -346,3 +359,6 @@ eval "$("${HOME}/opt/miniconda3/bin/conda" shell.zsh hook)"
 # Initialize rust
 source "${HOME}/.cargo/env"
 # [ is_linux end ]
+
+# Hook up shell integration
+source "${HOME}/.config/wezterm/shell-integration.sh"

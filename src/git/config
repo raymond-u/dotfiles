@@ -1,0 +1,17 @@
+# [ ? age ] base64=YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBlbThKYkF6aDljUWtZYWFLU05xWUlpVlZRWVN6SlFtQm1xb0F6dGxKM1NFCmhvQWF4MitoMXZOaVM5cEhEN2duYlVxdHlPK3AvZkdKOVh0bmx3T3RQNXcKLS0tIC9iWG14c0w2MEU1cmxZNkNjM2RHMEh4TDJaVWRva1pVaGxFRjhOYkoyZ2MK7Fia0clXIK6+AnTrX2LwCtBCXn9KkeTLGj7QYaaBIvLkKCFFZas3ZTCzp4+V17940w4TdZKWBEfa97qB3xVfocmz2mTa4acBTNgFor407xZFmYbXwtT++B9IVFkdPt7hZ343SskI3Q==
+[init]
+  defaultBranch = main
+[push]
+  default = current
+[color]
+  ui = auto
+[core]
+  autocrlf = input
+[merge]
+  ff = only
+[fetch]
+  prune = true
+[rebase]
+  autosquash = true
+[diff]
+  colorMoved = zebra
