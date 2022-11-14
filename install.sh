@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.3.0'
+version='0.3.1'
 
 # Scripts
 crypto=src/crypto.sh
@@ -82,6 +82,9 @@ brew_pkgs=(
     '  tealdeer'
     '  thefuck'
     ''
+    '# Media viewers'
+    '  chafa'
+    ''
     '# Text editors'
     '  nano'
     '  neovim'
@@ -144,6 +147,7 @@ nix_pkgs=(
     '  gnu-sed'
     '  less'
     '  p7zip'
+    '  unrar'
     ''
     '# General commands'
     '  bat'
@@ -172,6 +176,9 @@ nix_pkgs=(
     '  taskwarrior'
     '  tealdeer'
     '  thefuck'
+    ''
+    '# Media viewers'
+    '  chafa'
     ''
     '# Text editors'
     '  nano'

@@ -38,6 +38,9 @@ brew "task"
 brew "tealdeer"
 brew "thefuck"
 
+# Media viewers
+brew "chafa"
+
 # Text editors
 brew "nano"
 brew "neovim"

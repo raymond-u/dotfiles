@@ -8,7 +8,7 @@ in with pkgs;
     inherit wezterm;
     
     # System commands
-    inherit coreutils findutils gawk gnused less p7zip;
+    inherit coreutils findutils gawk gnused less p7zip unrar;
     
     # General commands
     inherit bat exa fd fzf hexyl ripgrep tree zoxide;
@@ -18,6 +18,9 @@ in with pkgs;
     
     # General utilities
     inherit age direnv hyperfine pandoc rename taskwarrior tealdeer thefuck;
+    
+    # Media viewers
+    inherit chafa;
     
     # Text editors
     inherit nano neovim vim;
