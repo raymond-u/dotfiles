@@ -8,7 +8,7 @@ in with pkgs;
     inherit wezterm;
     
     # System commands
-    inherit coreutils findutils gawk gnused less p7zip unrar;
+    inherit coreutils findutils gawk gnused less;
     
     # General commands
     inherit bat exa fd fzf hexyl ripgrep tree zoxide;
@@ -17,7 +17,7 @@ in with pkgs;
     inherit bottom duf htop ncdu neofetch procs;
     
     # General utilities
-    inherit age direnv hyperfine pandoc rename taskwarrior tealdeer thefuck;
+    inherit age direnv hyperfine p7zip pandoc rename taskwarrior tealdeer thefuck unrar;
     
     # Media viewers
     inherit chafa;

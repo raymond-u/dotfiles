@@ -70,21 +70,23 @@ cask "font-sarasa-gothic"
 cask "zotero"
 
 # IDE
+cask "pycharm"
 cask "visual-studio-code"
+
+# Media viewers
+cask "iina"
+cask "xnviewmp"
 
 # Productivity
 cask "raycast"
-
-# Network
-cask "lulu"
 
 # Terminal
 cask "wezterm"
 
 # Utilities
+cask "aldente"
 cask "keka"
 cask "xnconvert"
-cask "xnviewmp"
 
 # Web browser
 cask "google-chrome"

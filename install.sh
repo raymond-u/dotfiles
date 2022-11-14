@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.3.1'
+version='0.3.2'
 
 # Scripts
 crypto=src/crypto.sh
@@ -113,21 +113,23 @@ cask_pkgs=(
     '  zotero'
     ''
     '# IDE'
+    '  pycharm'
     '  visual-studio-code'
+    ''
+    '# Media viewers'
+    '  iina'
+    '  xnviewmp'
     ''
     '# Productivity'
     '  raycast'
-    ''
-    '# Network'
-    '  lulu'
     ''
     '# Terminal'
     '  wezterm'
     ''
     '# Utilities'
+    '  aldente'
     '  keka'
     '  xnconvert'
-    '  xnviewmp'
     ''
     '# Web browser'
     '  google-chrome'
@@ -146,8 +148,6 @@ nix_pkgs=(
     '  gawk'
     '  gnu-sed'
     '  less'
-    '  p7zip'
-    '  unrar'
     ''
     '# General commands'
     '  bat'
@@ -171,11 +171,13 @@ nix_pkgs=(
     '  age'
     '  direnv'
     '  hyperfine'
+    '  p7zip'
     '  pandoc'
     '  rename'
     '  taskwarrior'
     '  tealdeer'
     '  thefuck'
+    '  unrar'
     ''
     '# Media viewers'
     '  chafa'
@@ -889,7 +891,7 @@ EOF
 elif is_true is_macos; then
     # Create empty folders
     log_info 'Create empty folders in the home directory...'
-    is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/Playground" "${HOME}/Projects/visual_studio_code" "${HOME}/.local/state/"{less,zsh}
+    is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/Playground" "${HOME}/Projects/"{pycharm,visual_studio_code} "${HOME}/.local/state/"{less,zsh}
     
     # Prompt for the identity file
     is_true has_identity || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity

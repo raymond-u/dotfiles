@@ -106,7 +106,7 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 export PATH="${HOME}/bin${PATH:+:${PATH}}"
 # [ is_linux end ]
 # [ is_macos start ]
-export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/findutils/libexec/gnubin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
+export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/findutils/libexec/gnubin:$(brew --prefix)/opt/gnu-getopt/bin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
 # [ is_macos end ]
 export EDITOR='nvim'
 export VISUAL='nvim'
