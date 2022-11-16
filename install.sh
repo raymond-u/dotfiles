@@ -453,7 +453,7 @@ clean_up() {
     rm -rf "${tmpdir}"
     exec 1>&3 2>&4 3>&- 4>&-
     
-    trap SIGINT
+    trap ERR INT TERM
 }
 
 #################################
@@ -613,7 +613,7 @@ exec 3>&1 4>&2 &> >(tee "${log_file}")
 tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t 'tmp')"
 
 # Intercept signals
-trap clean_up ERR INT TERM
+trap 'clean_up; exit 1' ERR INT TERM
 
 # Print welcome messages
 print_welcome
