@@ -92,6 +92,11 @@ zstyle ':fzf-tab:complete:systemctl-*:*'                                  fzf-pr
 zstyle ':fzf-tab:complete:brew-(install|uninstall|search|info):*'         fzf-preview 'brew info "${word}"'
 # [ is_macos end ]
 
+# [ is_macos_arm64 start ]
+# Initialize homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+# [ is_macos_arm64 end ]
+
 # Set general envs
 export EDITOR='nvim'
 export VISUAL='nvim'

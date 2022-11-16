@@ -9,17 +9,19 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 export PATH="${HOME}/bin:${HOME}/.nix-profile/bin${PATH:+:${PATH}}"
 # [ is_linux end ]
 
-# [ is_macos_arm64 start ]
-# Initialize homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# [ is_macos_arm64 end ]
-
 # [ is_macos start ]
+# [ is_macos_arm64 start ]
+# Configure .NET
+export DOTNET_ROOT="$(/opt/homebrew/bin/brew --prefix)/opt/dotnet/libexec"
+
+# Configure Java
+export JAVA_HOME="$(/opt/homebrew/bin/brew --prefix)/opt/openjdk"
+# [ is_macos_arm64 end ]
+# [ ! is_macos_arm64 start ]
 # Configure .NET
 export DOTNET_ROOT="$(brew --prefix)/opt/dotnet/libexec"
-# [ is_macos end ]
 
-# [ is_macos start ]
 # Configure Java
 export JAVA_HOME="$(brew --prefix)/opt/openjdk"
+# [ ! is_macos_arm64 end ]
 # [ is_macos end ]
