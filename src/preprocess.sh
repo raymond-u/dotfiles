@@ -98,12 +98,12 @@ while (( $# > 0 )); do
             shift
             ;;
         --*)
-            [[ "$1" =~ --(.*) ]] && declare "${BASH_REMATCH[1]}"="$2"
+            [[ "$1" =~ --(.*) ]] && declare -g "${BASH_REMATCH[1]}"="$2"
             shift
             shift
             ;;
         *)
-            declare "$1"=true
+            declare -g "$1"=true
             shift
             ;;
     esac

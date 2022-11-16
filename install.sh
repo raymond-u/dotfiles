@@ -368,9 +368,9 @@ prompt_yesno() {
         read -rp $'\n'"${yellow}$1 ${yesno}>${no_color}" -n1 "$3"
         
         case "${!3}" in
-            [Yy]) declare "$3"=true; break ;;
-            [Nn]) declare "$3"=false; break ;;
-            '') declare "$3"="$([[ "$2" == 'y' ]] && echo true || echo false)"; break ;;
+            [Yy]) declare -g "$3"=true; break ;;
+            [Nn]) declare -g "$3"=false; break ;;
+            '') declare -g "$3"="$([[ "$2" == 'y' ]] && echo true || echo false)"; break ;;
         esac
     done
     
@@ -526,7 +526,7 @@ while (( $# > 0 )); do
                 log_error "Error: Unknown flag \"$1\"."
                 exit 0
             fi
-            declare "$1"=true
+            declare -g "$1"=true
             shift
             ;;
     esac
