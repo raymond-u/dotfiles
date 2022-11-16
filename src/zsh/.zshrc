@@ -98,18 +98,14 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # [ is_macos_arm64 end ]
 
 # Set general envs
-export XDG_CACHE_HOME="${HOME}/.cache"
-export XDG_CONFIG_HOME="${HOME}/.config"
-export XDG_DATA_HOME="${HOME}/.local/share"
-export XDG_STATE_HOME="${HOME}/.local/state"
+export EDITOR='nvim'
+export VISUAL='nvim'
 # [ is_linux start ]
 export PATH="${HOME}/bin${PATH:+:${PATH}}"
 # [ is_linux end ]
 # [ is_macos start ]
 export PATH="${HOME}/.local/bin:$(brew --prefix)/opt/coreutils/libexec/gnubin:$(brew --prefix)/opt/findutils/libexec/gnubin:$(brew --prefix)/opt/gnu-getopt/bin:$(brew --prefix)/opt/gnu-sed/libexec/gnubin${PATH:+:${PATH}}"
 # [ is_macos end ]
-export EDITOR='nvim'
-export VISUAL='nvim'
 
 # Configure shell history
 export HISTSIZE=10000
@@ -142,11 +138,6 @@ export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
 export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.ustc.edu.cn/homebrew-core.git
 # [ is_macos end ]
 # [ use_mirror end ]
-
-# [ is_macos start ]
-# Configure Java
-export JAVA_HOME="$(brew --prefix)/opt/openjdk"
-# [ is_macos end ]
 
 # Configure less
 export LESS='-R -i --wheel-lines=3'

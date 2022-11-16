@@ -55,6 +55,7 @@ brew "qrcp"
 brew "wget"
 
 # Languages
+brew "dotnet"
 brew "node"
 brew "openjdk"
 brew "python"
@@ -71,6 +72,7 @@ cask "zotero"
 
 # IDE
 cask "pycharm"
+cask "rider"
 cask "visual-studio-code"
 
 # Media viewers

@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.3.2'
+version='0.3.3'
 
 # Scripts
 crypto=src/crypto.sh
@@ -99,6 +99,7 @@ brew_pkgs=(
     '  wget'
     ''
     '# Languages'
+    '  dotnet'
     '  node'
     '  openjdk'
     '  python'
@@ -114,6 +115,7 @@ cask_pkgs=(
     ''
     '# IDE'
     '  pycharm'
+    '  rider'
     '  visual-studio-code'
     ''
     '# Media viewers'
