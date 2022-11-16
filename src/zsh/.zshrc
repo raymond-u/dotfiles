@@ -92,11 +92,6 @@ zstyle ':fzf-tab:complete:systemctl-*:*'                                  fzf-pr
 zstyle ':fzf-tab:complete:brew-(install|uninstall|search|info):*'         fzf-preview 'brew info "${word}"'
 # [ is_macos end ]
 
-# [ is_macos_arm64 start ]
-# Initialize homebrew
-eval "$(/opt/homebrew/bin/brew shellenv)"
-# [ is_macos_arm64 end ]
-
 # Set general envs
 export EDITOR='nvim'
 export VISUAL='nvim'
@@ -212,6 +207,10 @@ alias fix='sudo xattr -d com.apple.quarantine'
 alias mac='ifconfig en0 | rg ether'
 alias macrand='openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//" | xargs sudo ifconfig en0 ether'
 # [ is_macos end ]
+# [ is_macos_arm64 start ]
+alias pip='pip3'
+alias python='python3'
+# [ is_macos_arm64 end ]
 
 # Functions
 home-env() {
