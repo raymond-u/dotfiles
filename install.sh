@@ -968,7 +968,7 @@ elif is_true is_macos; then
     
     # Prompt for installation of GUI applications
     log_section 'Homebrew Packges'
-    is_true install_cask || prompt_yesno 'Do you wish to install GUI applications from Homebrew Cask?' 'y' install_cask
+    { is_true install_cask && ! is_true update; } || prompt_yesno 'Do you wish to install GUI applications from Homebrew Cask?' 'y' install_cask
     
     # Prompt for confirmation of package installation
     log_info "$(get_package_list)" yellow
@@ -979,6 +979,8 @@ elif is_true is_macos; then
     if ! is_dry_run; then
         ! is_true use_mirror || brew tap --custom-remote --force-auto-update homebrew/cask https://mirrors.ustc.edu.cn/homebrew-cask.git
         brew bundle --file="$(preprocess_file "${brewfile}")"
+        
+        # Configure openjdk
         sudo ln -sfn "$(brew --prefix)/opt/openjdk/libexec/openjdk.jdk" /Library/Java/JavaVirtualMachines/openjdk.jdk
     fi
     
