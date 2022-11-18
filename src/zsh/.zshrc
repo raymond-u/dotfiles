@@ -204,18 +204,17 @@ alias reload='echo; exec sudo -i -u "${USER}" bash -c "cd \"${PWD}\"; exec \"${S
 # [ ! can_sudo start ]
 alias reload='echo; exec "${SHELL}" -l'
 # [ ! can_sudo end ]
-alias local_ip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
-alias public_ip='curl ipinfo.io/ip'
+alias locip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
+alias pubip='curl ipinfo.io/ip'
 # [ is_macos start ]
 alias hosts='nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
+alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias mac='ifconfig en0 | rg ether'
 alias macrand='openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//" | xargs sudo ifconfig en0 ether'
-# [ is_macos end ]
-# [ is_macos_arm64 start ]
 alias pip='pip3'
 alias python='python3'
-# [ is_macos_arm64 end ]
+# [ is_macos end ]
 
 # Functions
 home-env() {
