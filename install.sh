@@ -712,7 +712,7 @@ if is_true is_linux; then
         # Use mirror for Nix
         if is_true use_mirror; then
             _can_use_mirror=true
-            if [[ ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
+            if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
                 if is_true can_sudo; then
                     log_info 'Add USTC mirror as a trusted substituter.'
                     is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
@@ -746,7 +746,13 @@ if is_true is_linux; then
         # Prompt for confirmation of package installation
         prompt_continue 'About to install the above packages from Nix.'
         log_info 'Install packages...'
-        is_dry_run || nix-env -i -f "${nix_env}"
+        if ! is_dry_run; then
+            if [[ ! -f "${HOME}/.config/nixpkgs/config.nix" || ! "$(<"${HOME}/.config/nixpkgs/config.nix")" =~ '{ allowUnfree = true; }' ]]; then
+                mkdir -p "${HOME}/.config/nixpkgs"
+                echo '{ allowUnfree = true; }' >>"${HOME}/.config/nixpkgs/config.nix"
+            fi
+            nix-env -i -f "${nix_env}"
+        fi
     fi
     
     # Configure Zsh

@@ -165,7 +165,9 @@ local function get_tab_title(tab, tabs, panes, config, hover, max_width)
     }
 end
 
-local function set_right_status(window, pane)
+hourglass = 0
+
+local function set_window_status(window, pane)
     local batteries = ""
     
     for _, battery in ipairs(wezterm.battery_info()) do
@@ -181,8 +183,36 @@ local function set_right_status(window, pane)
             battery_icon = wezterm.nerdfonts.fa_battery_three_quarters
         end
         
-        batteries = batteries .. battery_icon .. string.format(" %.0f%%", battery.state_of_charge * 100) .. "  "
+        batteries = battery_icon .. string.format(" %.0f%%", battery.state_of_charge * 100) .. "  "
     end
+    
+    local meta = pane:get_metadata() or {}
+    
+    if meta.is_tardy then
+        local seconds = meta.since_last_response_ms / 1000.0
+        
+        if seconds > 5 then
+            local tardy_icon = wezterm.nerdfonts.fa_hourglass_start
+            
+            if hourglass == 1 then
+                tardy_icon = fa_hourglass_half
+            elseif hourglass == 2 then
+                tardy_icon = fa_hourglass_end
+            end
+            
+            hourglass = hourglass + 1
+            local tardy = tardy_icon .. string.format(" %.1fs", seconds) .. "  "
+            
+            window:set_right_status(wezterm.format {
+                { Attribute = { Intensity = "Bold" } },
+                { Text = tardy .. batteries .. wezterm.strftime("%H:%M ") },
+            })
+            
+            return
+        end
+    end
+    
+    hourglass = 0
     
     window:set_right_status(wezterm.format {
         { Attribute = { Intensity = "Bold" } },
@@ -191,8 +221,7 @@ local function set_right_status(window, pane)
 end
 
 wezterm.on("format-tab-title", get_tab_title)
-
-wezterm.on("update-right-status", set_right_status)
+wezterm.on("update-status", set_window_status)
 
 return {
     set_environment_variables = {
@@ -367,6 +396,11 @@ return {
                 action = wezterm.action.SendKey { key = "`" },
             },
             {
+                key = "Tab",
+                mods = "",
+                action = wezterm.action.ResetTerminal,
+            },
+            {
                 key = "u",
                 mods = "",
                 action = wezterm.action.CharSelect { copy_on_select = false },
@@ -410,7 +444,6 @@ return {
     },
     
     check_for_updates_interval_seconds = 60 * 60 * 24 * 7,
-    show_update_window = true,
     
     native_macos_fullscreen_mode = true,
     window_background_opacity = 0.8,
