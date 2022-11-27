@@ -237,13 +237,16 @@ home-env() {
         fi
         
         bash -c "${script}" -s -u $(echo "${flags}")
+    elif [[ "$1" == 'version' ]]; then
+        echo "Raymond's home environment ${version}"
     elif [[ -z "${1+_}" ]] || [[ "$1" == 'help' ]]; then
         echo 'Usage:'
         echo '  home-env [<commands>]'
         echo
         echo 'Commands:'
-        echo '  list -- List packages installed with home environment.'
-        echo '  update -- Update dotfiles and installed packages.'
+        echo '  list     --  List packages installed with home environment.'
+        echo '  update   --  Update dotfiles and installed packages.'
+        echo '  version  --  Print version number and exit.'
     else
         echo 'Unknown command. Use "home-env help" to show help.'
     fi

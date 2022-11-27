@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.3.3'
+version='0.3.4'
 
 # Scripts
 crypto=src/crypto.sh
@@ -727,7 +727,6 @@ if is_true is_linux; then
                 if ! is_dry_run; then
                     if [[ -n "$(command -v nix-channel)" ]]; then
                         nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
-                        nix-channel --update
                     fi
                     mkdir -p "${HOME}/.config/nix"
                     echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
@@ -751,6 +750,7 @@ if is_true is_linux; then
                 mkdir -p "${HOME}/.config/nixpkgs"
                 echo '{ allowUnfree = true; }' >>"${HOME}/.config/nixpkgs/config.nix"
             fi
+            nix-channel --update
             nix-env -i -f "${nix_env}"
         fi
     fi
