@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.3.4'
+version='0.3.5'
 
 # Scripts
 crypto=src/crypto.sh
@@ -92,7 +92,6 @@ brew_pkgs=(
     ''
     '# Web'
     '  aria2'
-    '  curl'
     '  httpie'
     '  openssh'
     '  qrcp'

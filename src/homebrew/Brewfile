@@ -48,7 +48,6 @@ brew "vim"
 
 # Web
 brew "aria2"
-brew "curl"
 brew "httpie"
 brew "openssh"
 brew "qrcp"
