@@ -165,7 +165,7 @@ local function get_tab_title(tab, tabs, panes, config, hover, max_width)
     }
 end
 
-hourglass = 0
+Hourglass = 0
 
 local function set_window_status(window, pane)
     local batteries = ""
@@ -194,13 +194,13 @@ local function set_window_status(window, pane)
         if seconds > 5 then
             local tardy_icon = wezterm.nerdfonts.fa_hourglass_start
             
-            if hourglass == 1 then
-                tardy_icon = fa_hourglass_half
-            elseif hourglass == 2 then
-                tardy_icon = fa_hourglass_end
+            if Hourglass == 1 then
+                tardy_icon = wezterm.nerdfonts.fa_hourglass_half
+            elseif Hourglass == 2 then
+                tardy_icon = wezterm.nerdfonts.fa_hourglass_end
             end
             
-            hourglass = hourglass + 1
+            Hourglass = Hourglass + 1
             local tardy = tardy_icon .. string.format(" %.1fs", seconds) .. "  "
             
             window:set_right_status(wezterm.format {
@@ -212,7 +212,7 @@ local function set_window_status(window, pane)
         end
     end
     
-    hourglass = 0
+    Hourglass = 0
     
     window:set_right_status(wezterm.format {
         { Attribute = { Intensity = "Bold" } },
