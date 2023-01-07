@@ -217,7 +217,12 @@ alias hosts='nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
 alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias mac='ifconfig en0 | rg ether'
+# [ is_macos_arm64 start ]
+alias macrand='openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//" | xargs sudo ifconfig en0 lladdr'
+# [ is_macos_arm64 end ]
+# [ ! is_macos_arm64 start ]
 alias macrand='openssl rand -hex 6 | sed "s/\(..\)/\1:/g; s/.$//" | xargs sudo ifconfig en0 ether'
+# [ ! is_macos_arm64 end ]
 alias pip='pip3'
 alias python='python3'
 # [ is_macos end ]
