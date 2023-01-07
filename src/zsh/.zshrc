@@ -215,6 +215,7 @@ alias pubip='curl ipinfo.io/ip'
 # [ is_macos start ]
 alias hosts='nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
+alias fixx='sudo xattr -c'
 alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
 alias mac='ifconfig en0 | rg ether'
 # [ is_macos_arm64 start ]
