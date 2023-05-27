@@ -1,0 +1,97 @@
+# Shells
+brew "bash"
+brew "zsh"
+
+# System commands
+brew "coreutils"
+brew "findutils"
+brew "gawk"
+brew "gnu-getopt"
+brew "gnu-sed"
+brew "less"
+
+# General commands
+brew "bat"
+brew "exa"
+brew "fd"
+brew "fzf"
+brew "hexyl"
+brew "ripgrep"
+brew "tree"
+brew "zoxide"
+
+# System utilities
+brew "bottom"
+brew "duf"
+brew "htop"
+brew "ncdu"
+brew "neofetch"
+brew "procs"
+
+# General utilities
+brew "age"
+brew "direnv"
+brew "hyperfine"
+brew "pandoc"
+brew "rename"
+brew "task"
+brew "tealdeer"
+brew "thefuck"
+
+# Media viewers
+brew "chafa"
+
+# Text editors
+brew "nano"
+brew "neovim"
+brew "vim"
+
+# Web
+brew "aria2"
+brew "httpie"
+brew "openssh"
+brew "qrcp"
+brew "wget"
+
+# Languages
+brew "dotnet"
+brew "node"
+brew "openjdk"
+brew "python"
+brew "r"
+brew "rust"
+
+# Fonts
+tap "homebrew/cask-fonts"
+cask "font-sarasa-gothic"
+
+# [ install_cask start ]
+# Academics
+cask "zotero"
+
+# IDE
+cask "pycharm"
+cask "rider"
+cask "visual-studio-code"
+cask "webstorm"
+
+# Media viewers
+cask "iina"
+cask "xnviewmp"
+
+# Productivity
+cask "karabiner-elements"
+cask "raycast"
+
+# Terminal
+cask "wezterm"
+
+# Utilities
+cask "aldente"
+cask "keka"
+cask "shottr"
+cask "xnconvert"
+
+# Web browser
+cask "google-chrome"
+# [ install_cask end ]

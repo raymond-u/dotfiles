@@ -1,0 +1,25 @@
+[[row]]
+    [[row.child]]
+        type="cpu"
+    [[row.child]]
+        type="mem"
+[[row]]
+    [[row.child]]
+        type="net"
+    [[row.child]]
+        type="disk"
+[[row]]
+    [[row.child]]
+        type="proc"
+
+[mount_filter]
+is_list_ignored = true
+# [ is_linux start ]
+list = ["/boot/", "/snap/"]
+# [ is_linux end ]
+# [ is_macos start ]
+list = ["/System/Volumes/"]
+# [ is_macos end ]
+regex = false
+case_sensitive = false
+whole_word = false

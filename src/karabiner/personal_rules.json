@@ -1,0 +1,321 @@
+{
+    "title": "Personal rules",
+    "rules": [
+        {
+            "description": "Convert double-space to \" | \" in terminal emulator apps.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar"
+                    },
+                    "to": [
+                        {
+                            "key_code": "backslash",
+                            "modifiers": [
+                                "left_shift"
+                            ]
+                        },
+                        {
+                            "key_code": "spacebar",
+                            "repeat": false
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$"
+                            ]
+                        },
+                        {
+                            "type": "variable_if",
+                            "name": "sh_spacebar_pressed",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar"
+                    },
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "sh_spacebar_pressed",
+                                "value": true
+                            }
+                        },
+                        {
+                            "key_code": "spacebar"
+                        }
+                    ],
+                    "to_delayed_action": {
+                        "to_if_invoked": [
+                            {
+                                "set_variable": {
+                                    "name": "sh_spacebar_pressed",
+                                    "value": false
+                                }
+                            }
+                        ],
+                        "to_if_canceled": [
+                            {
+                                "set_variable": {
+                                    "name": "sh_spacebar_pressed",
+                                    "value": false
+                                }
+                            }
+                        ]
+                    },
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Use double-shift to open Raycast, except in IntelliJ IDEA and the like.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "left_shift"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Raycast.app'"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_unless",
+                            "bundle_identifiers": [
+                                "^com\\.jetbrains\\.[a-zA-Z]+",
+                                "^com\\.raycast\\.macos$"
+                            ]
+                        },
+                        {
+                            "type": "variable_if",
+                            "name": "rh_left_shift_pressed",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "left_shift"
+                    },
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "rh_left_shift_pressed",
+                                "value": true
+                            }
+                        },
+                        {
+                            "key_code": "left_shift"
+                        }
+                    ],
+                    "to_delayed_action": {
+                        "to_if_invoked": [
+                            {
+                                "set_variable": {
+                                    "name": "rh_left_shift_pressed",
+                                    "value": false
+                                }
+                            }
+                        ],
+                        "to_if_canceled": [
+                            {
+                                "set_variable": {
+                                    "name": "rh_left_shift_pressed",
+                                    "value": false
+                                }
+                            }
+                        ]
+                    },
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_unless",
+                            "bundle_identifiers": [
+                                "^com\\.jetbrains\\.[a-zA-Z]+",
+                                "^com\\.raycast\\.macos$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Launch or switch to apps by right cmd + letters.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "c",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Google Chrome.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "f",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Finder.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "w",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'WezTerm.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "v",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Visual Studio Code.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "p",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Pages.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "k",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Keynote.app'"
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "n",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_command"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Numbers.app'"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Change delete + equal sign to forward delete.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "equal_sign"
+                            },
+                            {
+                                "key_code": "delete_or_backspace"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "delete_forward"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
