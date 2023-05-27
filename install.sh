@@ -478,7 +478,7 @@ extract_encrypted_file() {
 }
 
 clean_up() {
-    log_info 'Clean up...'
+    log_info 'Cleaning up...'
     while popd &>/dev/null; do :; done
     rm -rf "${tmpdir}"
     exec 1>&3 2>&4 3>&- 4>&-
@@ -1215,8 +1215,8 @@ EOF
     unset _reminder
     echo
     ! is_true update || log_info 'You might want to update zinit and neovim plugins manually.'
-    log_info "Complete log has been saved to ${log_file}."
-    log_info 'You can use "home-env" command to keep home environment up-to-date.'
+    log_info "A complete log of this session has been saved to ${log_file}."
+    log_info 'Use the "home-env" command to manage installed home environment.'
 
     # Clean up
     clean_up
