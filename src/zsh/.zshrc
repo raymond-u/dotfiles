@@ -280,7 +280,7 @@ home-env() {
                 local string
                 IFS= read -r -d $'\04' string'?Please enter a string to encrypt. Use Ctrl+D to finish:'$'\n'
                 printf '%s' $'\n''# [ ? age ] base64='
-                age -R "${HOME}/.passage/store/.age-recipients" <<<"${string}" | base64 -w0
+                age -R "${HOME}/.passage/store/.age-recipients" <<<"${string}" | base64 | tr -d '\n'
                 echo
             else
                 if [[ -d "$3" ]] || [[ -f "$3" ]]; then
@@ -288,7 +288,7 @@ home-env() {
                         echo 'Error: archive already exists.' >&2
                         return 1
                     fi
-                    tar --exclude ".DS_Store" -cz -C "$(dirname "$3")" "$(basename "$3")" | base64 -w0 | age -R "${HOME}/.passage/store/.age-recipients" | base64 -w0 >"$(dirname "$3")/archive.age"
+                    tar --exclude ".DS_Store" -cz -C "$(dirname "$3")" "$(basename "$3")" | base64 | tr -d '\n' | age -R "${HOME}/.passage/store/.age-recipients" | base64 | tr -d '\n' >"$(dirname "$3")/archive.age"
                     echo 'Encrypted archive created successfully.'
                 else
                     echo 'Error: file not found.' >&2

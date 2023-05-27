@@ -99,7 +99,7 @@ if [[ "${encrypt}" == true ]]; then
         exit 0
     fi
 
-    "${path}" -r "${recipient}" <<<"${string}" | base64 -w0
+    "${path}" -r "${recipient}" <<<"${string}" | base64 | tr -d '\n'
 fi
 
 # Decrypt
