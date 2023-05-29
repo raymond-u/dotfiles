@@ -113,17 +113,22 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # Set general envs
 export EDITOR='nvim'
 export VISUAL='nvim'
+
+# Set path
+typeset -U path
 # [ is_linux start ]
-export PATH="${HOME}/bin${PATH:+:${PATH}}"
+export path=("${HOME}/bin" $path)
 # [ is_linux end ]
 # [ is_macos start ]
-export PATH="${HOME}/.local/bin\
-    :$(brew --prefix)/opt/coreutils/libexec/gnubin\
-    :$(brew --prefix)/opt/findutils/libexec/gnubin\
-    :$(brew --prefix)/opt/gawk/libexec/gnubin\
-    :$(brew --prefix)/opt/gnu-getopt/bin\
-    :$(brew --prefix)/opt/gnu-sed/libexec/gnubin\
-    ${PATH:+:${PATH}}"
+export path=(
+    "${HOME}/.local/bin"
+    "$(brew --prefix)/opt/coreutils/libexec/gnubin"
+    "$(brew --prefix)/opt/findutils/libexec/gnubin"
+    "$(brew --prefix)/opt/gawk/libexec/gnubin"
+    "$(brew --prefix)/opt/gnu-getopt/bin"
+    "$(brew --prefix)/opt/gnu-sed/libexec/gnubin"
+    $path
+)
 # [ is_macos end ]
 
 # Configure shell history
