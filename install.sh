@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Automate home environment setup.
+# Automate the home environment setup.
 
 # Unofficial bash strict mode
 set -euo pipefail
@@ -264,30 +264,30 @@ reminders=()
 print_help() {
     echo 'Usage:'
     echo '  bash install.sh [options...]'
-    echo '  Automate home environment setup.'
+    echo '  Automate setup of an opinionated home environment composed by Raymond.'
     echo
     echo 'Supported platforms:'
     echo '  Linux'
     echo '  macOS (including arm64 version)'
     echo
     echo 'Options:'
-    echo '  -h, --help              Show help, then exit.'
-    echo '  -v, --version           Show version, then exit.'
-    echo '  -u, --update            Update home environment. Intended for internal use only.'
+    echo '  -h, --help              Show help message and exit.'
+    echo '  -v, --version           Show version information and exit.'
+    echo '  -u, --update            Update the home environment. Intended for internal use only.'
     echo '  -n, --dry-run           Print info, but do not change anything.'
     echo '  --is-linux              Force the script to identify the OS as Linux.'
     echo '  --is-macos              Force the script to identify the OS as macOS.'
     echo '  --is-macos-arm64        Force the script to identify the OS as macOS arm64.'
-    echo '  --can-sudo              Use sudo when needed.'
-    echo '  --has-identity          Can use the identity file to decrypt secrets.'
+    echo '  --can-sudo              Use sudo when necessary.'
+    echo '  --has-identity          Use an identity file to decrypt secrets.'
     echo '  --identity-file         Specify the identity file.'
-    echo '  --install-cask          Install GUI applications for macOS.'
-    echo '  --use-mirror            Use USTC mirrors.'
+    echo '  --install-cask          Install GUI applications for macOS using Homebrew and Cask.'
+    echo '  --use-mirror            Use USTC mirrors for faster downloads in China.'
 }
 
 print_welcome() {
     if is_true update; then
-        log_info 'Updating home environment...'
+        log_info 'Updating the home environment...'
         return
     fi
 
@@ -656,7 +656,7 @@ main() {
 
     # Propmt for use of mirrors
     if ! is_true use_mirror && ! is_true update; then
-        prompt_yesno 'Do you wish to use USTC mirrors?' 'n' use_mirror
+        prompt_yesno 'Do you want to use USTC mirrors for faster downloads in China?' 'n' use_mirror
     fi
 
     # Clone dotfiles into temp directory
@@ -739,7 +739,7 @@ main() {
                         curl -L "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
                         log_info 'A shell will be spawned by PRoot. Please enter "sh <(curl -L https://nixos.org/nix/install)" in the new shell to install Nix.'
-                        log_info "After Nix installation is finished, please continue to enter \"nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'\" to set up home environment."
+                        log_info "After Nix installation is finished, please continue to enter \"nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'\" to set up the home environment."
                         log_info "When done, please enter exit to get back."
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
@@ -888,7 +888,7 @@ main() {
 
             # Check if config files already exist
             if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' _yesno
+                prompt_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
             fi
 
             # Install NvChad
@@ -1065,7 +1065,7 @@ EOF
 
         # Prompt for installation of GUI applications
         log_section 'Homebrew Packges'
-        { is_true install_cask && ! is_true update; } || prompt_yesno 'Do you wish to install GUI applications from Homebrew Cask?' 'y' install_cask
+        { is_true install_cask && ! is_true update; } || prompt_yesno 'Do you want to install GUI applications from Homebrew Cask?' 'y' install_cask
 
         # Prompt for confirmation of package installation
         log_info "$(get_package_list)" yellow
@@ -1119,7 +1119,7 @@ EOF
 
             # Check if config files already exist
             if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_yesno 'Neovim config files already exist. Do you wish to remove them and install NvChad?' 'n' _yesno
+                prompt_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
             fi
 
             # Install NvChad
@@ -1155,7 +1155,7 @@ EOF
 
             # Move the identity file
             if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then
-                prompt_yesno "Do you wish to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
+                prompt_yesno "Do you want to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
                 if is_true _yesno; then
                     log_info "Move the identity file to ${HOME}/.passage/identities."
                     if ! is_dry_run; then
@@ -1216,7 +1216,7 @@ EOF
     echo
     ! is_true update || log_info 'You might want to update zinit and neovim plugins manually.'
     log_info "A complete log has been saved to ${log_file}."
-    log_info 'Use the "home-env" command to manage installed home environment.'
+    log_info 'Use the "home-env" command to manage the installed home environment.'
 
     # Clean up
     clean_up

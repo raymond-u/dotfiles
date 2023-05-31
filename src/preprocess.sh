@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
 #
-# Pre-process files according to custom rules.
+# Transform files based on custom rules and flags.
 #
-# This script accepts flags, values, etc., and transforms files according to the following rules (rules can be nested):
+# The script accepts flags, values, and other arguments, transforming files based on the following rules (rules can be nested):
 # 1. Keep lines between
 #    # [ FOO start ]
 #    # [ FOO end ]
-#    if FOO is a flag; otherwise remove.
+#    if FOO is a flag; otherwise, remove.
 # 2. Keep lines between
 #    # [ ! FOO start ]
 #    # [ ! FOO end ]
-#    if FOO is not a flag; otherwise remove.
+#    if FOO is not a flag; otherwise, remove.
 # 3. Decrypt and replace string xxxxxx
 #    # [ ? age ] base64=xxxxxx
-#    if an identity file is present; otherwise remove.
+#    if an identity file is present; otherwise, remove.
 # 4. Assign the value of BAZ to a local variable BAR.
 #    # [ @ BAR=BAZ ]
 
@@ -26,32 +26,29 @@ set -euo pipefail
 
 print_help() {
     echo 'Usage:'
-    echo '  preprocess.sh -i path -o path [options...] [values...] [flags...]'
-    echo '  Transform files according to custom rules.'
+    echo '  preprocess.sh -i input_path -o output_path [options...] [values...] [flags...]'
+    echo '  Transform files based on custom rules and flags.'
     echo
     echo 'Options:'
-    echo '  -h                      Show help, then exit.'
-    echo '  -i                      Specify the input file.'
-    echo '  -o                      Specify the output file.'
-    echo '  -s                      Specify the path to crypto.sh.'
-    echo '  -p                      Specify the path to age.'
-    echo '  -f                      Specify the identity file.'
+    echo '  -h        Show help message and exit.'
+    echo '  -i        Set the input file path.'
+    echo '  -o        Set the output file path.'
+    echo '  -s        Set the path to crypto.sh.'
+    echo '  -p        Set the path to the age binary.'
+    echo '  -f        Set the identity file path.'
     echo
-    echo 'Example:'
-    echo '  preprocess.sh -i .zshrc -o .zshrc.pd --name Raymond --version 1.0 can_sudo is_linux'
-    echo
-    echo 'This script accepts flags, values, etc., and transforms files according to the following rules (rules can be nested):'
+    echo 'The script accepts flags, values, and other arguments, transforming files based on the following rules (rules can be nested):'
     echo '1. Keep lines between'
     echo '   # [ foo start ]'
     echo '   # [ foo end ]'
-    echo '   if FOO is a flag; otherwise remove.'
+    echo '   if FOO is a flag; otherwise, remove.'
     echo '2. Keep lines between'
     echo '   # [ ! foo start ]'
     echo '   # [ ! foo end ]'
-    echo '   if FOO is not a flag; otherwise remove.'
+    echo '   if FOO is not a flag; otherwise, remove.'
     echo '3. Decrypt and replace string xxxxxx'
     echo '   # [ ? age ] base64=xxxxxx'
-    echo '   if an identity file is present; otherwise remove.'
+    echo '   if an identity file is present; otherwise, remove.'
     echo '4. Assign the value of BAZ to a local variable BAR.'
     echo '   # [ @ BAR=BAZ ]'
 }
