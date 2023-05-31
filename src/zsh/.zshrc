@@ -117,7 +117,7 @@ export VISUAL='nvim'
 # Set path
 typeset -U path
 # [ is_linux start ]
-export path=("${HOME}/bin" $path)
+export path=("${HOME}/bin" ${path})
 # [ is_linux end ]
 # [ is_macos start ]
 export path=(
@@ -127,7 +127,7 @@ export path=(
     "$(brew --prefix)/opt/gawk/libexec/gnubin"
     "$(brew --prefix)/opt/gnu-getopt/bin"
     "$(brew --prefix)/opt/gnu-sed/libexec/gnubin"
-    $path
+    ${path}
 )
 # [ is_macos end ]
 
