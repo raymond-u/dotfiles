@@ -287,7 +287,7 @@ print_help() {
 
 print_welcome() {
     if is_true update; then
-        log_info 'Update home environment...'
+        log_info 'Updating home environment...'
         return
     fi
 
@@ -660,14 +660,14 @@ main() {
     fi
 
     # Clone dotfiles into temp directory
-    log_info 'Clone repo into a temporary directory...'
+    log_info 'Cloning repo into a temporary directory...'
     git clone --depth=1 --quiet "${repo}" "${tmpdir}/dotfiles"
     pushd "${tmpdir}/dotfiles" >/dev/null
 
     # Configure for Linux
     if is_true is_linux; then
         # Create empty folders
-        log_info 'Create empty folders in the home directory...'
+        log_info 'Create empty folders in the home directory.'
         is_dry_run || mkdir -p "${HOME}/"{bin,downloads,opt,playground} "${HOME}/.local/state/"{less,zsh}
 
         # Configure Nix
@@ -701,21 +701,21 @@ main() {
                 fi
                 case "${_nix_installation}" in
                     multi-user)
-                        log_info 'Install Nix in multi-user mode...'
+                        log_info 'Installing Nix in multi-user mode...'
                         if ! is_dry_run; then
                             sh <(curl -L https://nixos.org/nix/install) --daemon
                             source /etc/profile.d/nix.sh
                         fi
                         ;;
                     single-user)
-                        log_info 'Install Nix in single-user mode...'
+                        log_info 'Installing Nix in single-user mode...'
                         if ! is_dry_run; then
                             sh <(curl -L https://nixos.org/nix/install) --no-daemon
                             source /etc/profile.d/nix.sh
                         fi
                         ;;
                     nix-user-chroot)
-                        log_info 'Install Nix in non-root mode using nix-user-chroot...'
+                        log_info 'Installing Nix in non-root mode using nix-user-chroot...'
                         curl -L "https://github.com/nix-community/nix-user-chroot/releases/download/1.2.2/nix-user-chroot-bin-1.2.2-${architecture}-unknown-linux-musl" >"${tmpdir}/nix-user-chroot"
                         chmod +x "${tmpdir}/nix-user-chroot"
                         if ! is_dry_run; then
@@ -735,7 +735,7 @@ main() {
                         fi
                         unset _yesno
                         # TODO: Check support for PRoot
-                        log_info 'Install Nix in non-root mode using proot...'
+                        log_info 'Installing Nix in non-root mode using proot...'
                         curl -L "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
                         log_info 'A shell will be spawned by PRoot. Please enter "sh <(curl -L https://nixos.org/nix/install)" in the new shell to install Nix.'
@@ -803,7 +803,7 @@ main() {
 
         # Prompt for confirmation of package installation
         prompt_continue 'About to install the above packages from Nix.'
-        log_info 'Install packages...'
+        log_info 'Installing packages...'
         if ! is_dry_run; then
             if [[ ! -f "${HOME}/.config/nixpkgs/config.nix" || ! "$(<"${HOME}/.config/nixpkgs/config.nix")" =~ '{ allowUnfree = true; }' ]]; then
                 mkdir -p "${HOME}/.config/nixpkgs"
@@ -829,7 +829,7 @@ main() {
             log_section 'Zsh Configuration'
 
             # Install Zinit
-            log_info 'Install Zinit...'
+            log_info 'Installing Zinit...'
             is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
             reminders+=('Zinit: Zinit will self-update when the shell reloads.')
             reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
@@ -893,7 +893,7 @@ main() {
 
             # Install NvChad
             if is_true _yesno; then
-                log_info 'Install NvChad...'
+                log_info 'Installing NvChad...'
                 if ! is_dry_run; then
                     rm -rf "${HOME}/.cache/nvim" "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
                     git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
@@ -924,14 +924,14 @@ EOF
             fi
 
             # Install Conda
-            log_info 'Install Conda...'
+            log_info 'Installing Conda...'
             if ! is_dry_run; then
                 curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${architecture}.sh" >"${tmpdir}/miniconda3.sh"
                 bash "${tmpdir}/miniconda3.sh" -b -p "${HOME}/opt/miniconda3"
             fi
 
             # Install Mamba
-            log_info 'Install Mamba...'
+            log_info 'Installing Mamba...'
             if ! is_dry_run; then
                 if [[ -n "${BASH}" ]]; then
                     eval "$("${HOME}/opt/miniconda3/bin/conda" shell.bash hook)"
@@ -942,7 +942,7 @@ EOF
             fi
 
             # Install Snakemake
-            log_info 'Install Snakemake...'
+            log_info 'Installing Snakemake...'
             is_dry_run || mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
         fi
 
@@ -956,7 +956,7 @@ EOF
             fi
 
             # Install Rust
-            log_info 'Install Rust...'
+            log_info 'Installing Rust...'
             if ! is_dry_run; then
                 curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
                 source "${HOME}/.cargo/env"
@@ -964,7 +964,7 @@ EOF
             fi
 
             # Install rust-script
-            log_info 'Install rust-script...'
+            log_info 'Installing rust-script...'
             is_dry_run || cargo install rust-script
         fi
 
@@ -990,7 +990,7 @@ EOF
     # Configure for macOS
     elif is_true is_macos; then
         # Create empty folders
-        log_info 'Create empty folders in the home directory...'
+        log_info 'Create empty folders in the home directory.'
         is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/.local/state/"{less,zsh} "${HOME}/Developer" "${HOME}/Playground"
 
         # Prompt for the identity file
@@ -1020,21 +1020,21 @@ EOF
         # Configure macOS
         if ! is_true update; then
             log_section 'macOS Configuration'
-            log_info 'Configure general UI/UX...'
-            log_info 'Configure trackpad, mouse and keyboard...'
-            log_info 'Configure energy saving...'
-            log_info 'Configure screen...'
-            log_info 'Configure bluetooth accessories...'
-            log_info 'Configure Disk Utility...'
-            log_info 'Configure Dock, Dashboard and Mission Control...'
-            log_info 'Configure Finder...'
-            log_info 'Configure Mac App Store...'
-            log_info 'Configure Mail...'
-            log_info 'Configure Photos...'
-            log_info 'Configure Safari...'
-            log_info 'Configure Terminal...'
-            log_info 'Configure TextEdit...'
-            log_info 'Configure Time Machine...'
+            log_info 'Configure general UI/UX settings.'
+            log_info 'Configure trackpad, mouse and keyboard settings.'
+            log_info 'Configure energy saving settings.'
+            log_info 'Configure screen settings.'
+            log_info 'Configure bluetooth accessory settings.'
+            log_info 'Configure Disk Utility settings.'
+            log_info 'Configure Dock, Dashboard and Mission Control settings.'
+            log_info 'Configure Finder settings.'
+            log_info 'Configure Mac App Store settings.'
+            log_info 'Configure Mail settings.'
+            log_info 'Configure Photos settings.'
+            log_info 'Configure Safari settings.'
+            log_info 'Configure Terminal settings.'
+            log_info 'Configure TextEdit settings.'
+            log_info 'Configure Time Machine settings.'
             is_dry_run || bash "${set_defaults}"
         fi
 
@@ -1050,7 +1050,7 @@ EOF
             fi
 
             # Install Homebrew
-            log_info 'Install Homebrew...'
+            log_info 'Installing Homebrew...'
             is_dry_run || bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
             # One extra step required for Apple Silicon machines
@@ -1059,7 +1059,7 @@ EOF
             fi
 
             # Install command-not-found
-            log_info 'Install Homebrew command-not-found...'
+            log_info 'Installing Homebrew command-not-found...'
             is_dry_run || brew command-not-found-init
         fi
 
@@ -1072,7 +1072,7 @@ EOF
         prompt_continue 'About to install the above packages from Homebrew.'
 
         # Install from Homebrew
-        log_info 'Install packages...'
+        log_info 'Installing packages...'
         if ! is_dry_run; then
             brew bundle --file="$(preprocess_file "${brewfile}")"
 
@@ -1085,7 +1085,7 @@ EOF
             log_section 'Zsh Configuration'
 
             # Install Zinit
-            log_info 'Install Zinit...'
+            log_info 'Installing Zinit...'
             is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
             reminders+=('Zinit: Zinit will self-update when the shell reloads.')
             reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
@@ -1124,7 +1124,7 @@ EOF
 
             # Install NvChad
             if is_true _yesno; then
-                log_info 'Install NvChad...'
+                log_info 'Installing NvChad...'
                 if ! is_dry_run; then
                     rm -rf "${HOME}/.cache/nvim" "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
                     git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
@@ -1140,7 +1140,7 @@ EOF
 
             # Install passage
             if ! is_true update; then
-                log_info 'Install passage...'
+                log_info 'Installing passage...'
                 git clone --depth=1 --quiet https://github.com/FiloSottile/passage "${tmpdir}/passage"
                 if ! is_dry_run; then
                     pushd "${tmpdir}/passage" >/dev/null
@@ -1215,7 +1215,7 @@ EOF
     unset _reminder
     echo
     ! is_true update || log_info 'You might want to update zinit and neovim plugins manually.'
-    log_info "A complete log of this session has been saved to ${log_file}."
+    log_info "A complete log has been saved to ${log_file}."
     log_info 'Use the "home-env" command to manage installed home environment.'
 
     # Clean up
