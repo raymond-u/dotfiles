@@ -107,7 +107,7 @@ if [[ "${decrypt}" == true ]]; then
     # Read string and passphrase from stdin
     read -ra data
     string="${data[0]}"
-    passphrase="${data[@]:1}"
+    passphrase="${data[*]:1}"
 
     # Check if the identity file exists
     if [[ ! -f "${identity}" ]]; then
