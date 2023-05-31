@@ -348,31 +348,24 @@ log_section() {
 }
 
 prompt_continue() {
-    local key
-
-    while true; do
-        read -rp $'\n'"${yellow}$1 Press any key to continue. >${no_color}" -n1 key
-
-        case "${key}" in
-            *) break ;;
-        esac
-    done
-
+    local _dummy
+    read -srp $'\n'"${yellow}$1 Press any key to continue. >${no_color}" -n1 _dummy
     echo
 }
 
 prompt_passphrase() {
     read -srp $'\n'"${yellow}$1 >${no_color}" "$2"
-
     echo
 }
 
 prompt_string() {
     read -rp $'\n'"${yellow}$1 >${no_color}" "$2"
+    echo
 }
 
 prompt_yesno() {
-    local yesno="$([[ "$2" == 'y' ]] && echo '(Y/n)' || echo '(y/N)')"
+    local yesno
+    yesno="$([[ "$2" == 'y' ]] && echo '(Y/n)' || echo '(y/N)')"
 
     while true; do
         read -rp $'\n'"${yellow}$1 ${yesno}>${no_color}" -n1 "$3"
@@ -383,7 +376,6 @@ prompt_yesno() {
             '') declare -g "$3"="$([[ "$2" == 'y' ]] && echo true || echo false)"; break ;;
         esac
     done
-
     echo
 }
 
