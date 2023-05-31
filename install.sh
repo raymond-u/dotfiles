@@ -331,7 +331,7 @@ EOF
 
     echo "A full-fledged shell setup, common packages, and some tweaks will be installed.${no_color}"
 
-    prompt_continue 'Ready?'
+    prompt_for_continue 'Ready?'
 }
 
 log_error() {
@@ -347,23 +347,23 @@ log_section() {
     echo "${cyan}#################### $1 ####################${no_color}"
 }
 
-prompt_continue() {
+prompt_for_continue() {
     local _dummy
     read -srp $'\n'"${yellow}$1 Press any key to continue. >${no_color}" -n1 _dummy
     echo
 }
 
-prompt_passphrase() {
+prompt_for_passphrase() {
     read -srp $'\n'"${yellow}$1 >${no_color}" "$2"
     echo
 }
 
-prompt_string() {
+prompt_for_string() {
     read -rp $'\n'"${yellow}$1 >${no_color}" "$2"
     echo
 }
 
-prompt_yesno() {
+prompt_for_yesno() {
     local yesno
     yesno="$([[ "$2" == 'y' ]] && echo '(Y/n)' || echo '(y/N)')"
 
@@ -643,12 +643,12 @@ main() {
 
     # Prompt for use of sudo
     if ! is_true can_sudo && ! is_true update; then
-        prompt_yesno 'Can we use sudo?' 'y' can_sudo
+        prompt_for_yesno 'Can we use sudo?' 'y' can_sudo
     fi
 
     # Propmt for use of mirrors
     if ! is_true use_mirror && ! is_true update; then
-        prompt_yesno 'Do you want to use USTC mirrors for faster downloads in China?' 'n' use_mirror
+        prompt_for_yesno 'Do you want to use USTC mirrors for faster downloads in China?' 'n' use_mirror
     fi
 
     # Clone dotfiles into temp directory
@@ -720,7 +720,7 @@ main() {
                         reminders+=('nix-user-chroot: Note that you can only use Nix and the installed packages within the shell started by "nix-user-chroot ~/.nix bash".')
                         ;;
                     proot)
-                        prompt_yesno "Nix must be installed using PRoot, but support for PRoot is not complete and haven't been tested. Do you still want to continue?" 'n' _yesno
+                        prompt_for_yesno "Nix must be installed using PRoot, but support for PRoot is not complete and haven't been tested. Do you still want to continue?" 'n' _yesno
                         if ! is_true _yesno; then
                             clean_up
                             exit 0
@@ -794,7 +794,7 @@ main() {
         log_info "$(get_package_list)" yellow
 
         # Prompt for confirmation of package installation
-        prompt_continue 'About to install the above packages from Nix.'
+        prompt_for_continue 'About to install the above packages from Nix.'
         log_info 'Installing packages...'
         if ! is_dry_run; then
             if [[ ! -f "${HOME}/.config/nixpkgs/config.nix" || ! "$(<"${HOME}/.config/nixpkgs/config.nix")" =~ '{ allowUnfree = true; }' ]]; then
@@ -880,7 +880,7 @@ main() {
 
             # Check if config files already exist
             if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
+                prompt_for_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
             fi
 
             # Install NvChad
@@ -986,13 +986,13 @@ EOF
         is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/.local/state/"{less,zsh} "${HOME}/Developer" "${HOME}/Playground"
 
         # Prompt for the identity file
-        is_true has_identity || prompt_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity
+        is_true has_identity || prompt_for_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity
         if is_true has_identity && ! is_true identity_file; then
             if [[ -f "${HOME}/.passage/identities" ]]; then
-                prompt_continue "Use the identity file located at ${HOME}/.passage/identities."
+                prompt_for_continue "Use the identity file located at ${HOME}/.passage/identities."
                 identity_file="${HOME}/.passage/identities"
             else
-                prompt_string 'Please enter the path to the identity file.' identity_file
+                prompt_for_string 'Please enter the path to the identity file.' identity_file
                 [[ -f "${identity_file}" ]] || has_identity=false
             fi
         fi
@@ -1007,7 +1007,7 @@ EOF
         fi
 
         # Prompt for the passphrase
-        ! is_true has_identity || prompt_passphrase "Please enter the passphrase of the identity file. (If there isn't one, just hit enter.)" passphrase
+        ! is_true has_identity || prompt_for_passphrase "Please enter the passphrase of the identity file. (If there isn't one, just hit enter.)" passphrase
 
         # Configure macOS
         if ! is_true update; then
@@ -1057,11 +1057,11 @@ EOF
 
         # Prompt for installation of GUI applications
         log_section 'Homebrew Packges'
-        { is_true install_cask && ! is_true update; } || prompt_yesno 'Do you want to install GUI applications from Homebrew Cask?' 'y' install_cask
+        { is_true install_cask && ! is_true update; } || prompt_for_yesno 'Do you want to install GUI applications from Homebrew Cask?' 'y' install_cask
 
         # Prompt for confirmation of package installation
         log_info "$(get_package_list)" yellow
-        prompt_continue 'About to install the above packages from Homebrew.'
+        prompt_for_continue 'About to install the above packages from Homebrew.'
 
         # Install from Homebrew
         log_info 'Installing packages...'
@@ -1111,7 +1111,7 @@ EOF
 
             # Check if config files already exist
             if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
+                prompt_for_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
             fi
 
             # Install NvChad
@@ -1147,7 +1147,7 @@ EOF
 
             # Move the identity file
             if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then
-                prompt_yesno "Do you want to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
+                prompt_for_yesno "Do you want to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
                 if is_true _yesno; then
                     log_info "Move the identity file to ${HOME}/.passage/identities."
                     if ! is_dry_run; then
@@ -1214,7 +1214,7 @@ EOF
     clean_up
 
     # Reload the shell
-    prompt_continue 'About to reload the shell.'
+    prompt_for_continue 'About to reload the shell.'
     echo
     is_true can_sudo && exec sudo -i -u "${USER}" bash -c "cd '${PWD}'; exec '$(command -v zsh)' -l" || exec "$(command -v zsh)" -l
 }
