@@ -343,11 +343,6 @@ weather() {
     curl -fsS 'wttr.in/'"$1"'?mMAF'
 }
 
-# Source local .zshrc
-if [[ -f "${HOME}/.zshrc.local" ]]; then
-    source "${HOME}/.zshrc.local"
-fi
-
 # [ is_macos start ]
 # Initialize command-not-found
 # [ is_macos_arm64 start ]
@@ -431,3 +426,8 @@ source "${HOME}/.cargo/env"
 
 # Hook up shell integration
 WEZTERM_SHELL_SKIP_ALL=0 source "${HOME}/.config/wezterm/shell-integration.sh"
+
+# Source local .zshrc
+if [[ -f "${HOME}/.zshrc.local" ]]; then
+    source "${HOME}/.zshrc.local"
+fi
