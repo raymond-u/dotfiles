@@ -256,6 +256,8 @@ identity_file=
 passphrase=
 
 # Misc
+temp_stdout=
+temp_stderr=
 reminders=()
 
 #################################
@@ -486,7 +488,7 @@ clean_up() {
     log_info 'Cleaning up...'
     while popd &>/dev/null; do :; done
     rm -rf "${tmpdir}"
-    exec 1>&3 2>&4 3>&- 4>&-
+    exec 1>&"${temp_stdout}" 2>&"${temp_stderr}" {temp_stdout}>&- {temp_stderr}>&-
 
     trap ERR INT TERM
 }
@@ -643,7 +645,7 @@ main() {
 
     # Redirect output
     log_file="$(is_true update && echo "${PWD}/home_env_update.log" || echo "${PWD}/home_env_install.log")"
-    exec 3>&1 4>&2 &> >(tee "${log_file}")
+    exec {temp_stdout}>&1 {temp_stderr}>&2 &> >(tee "${log_file}")
 
     # Create temporary directory
     tmpdir="$(mktemp -d 2>/dev/null || mktemp -d -t 'tmp')"
