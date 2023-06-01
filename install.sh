@@ -43,6 +43,7 @@ wezterm=src/wezterm/wezterm.lua
 wgetrc=src/wget/wgetrc
 zshenv=src/zsh/.zshenv
 zshrc=src/zsh/.zshrc
+zshrclocal=src/zsh/.zshrc.local
 
 # Package list
 brew_pkgs=(
@@ -434,6 +435,7 @@ preprocess_file() {
 
 put_file() {
     log_info "Put $1 config file to $3."
+
     if ! is_dry_run; then
         if [[ -f "$3" ]]; then
             if ! is_true update; then
@@ -446,6 +448,17 @@ put_file() {
         fi
 
         cp "$(preprocess_file "$2")" "$3"
+    fi
+}
+
+put_file_if_not_exists() {
+    if ! [[ -f "$3" ]]; then
+        log_info "Put $1 config file to $3."
+
+        if ! is_dry_run; then
+            mkdir -p "$(dirname "$3")"
+            cp "$(preprocess_file "$2")" "$3"
+        fi
     fi
 }
 
@@ -972,8 +985,9 @@ EOF
         put_file 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
-        put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
         put_file 'Zsh' "${zshenv}" "${HOME}/.zshenv"
+        put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
+        put_file_if_not_exists 'Zsh' "${zshrclocal}" "${HOME}/.zshrc.local"
 
         # Reminders for Linux
         reminders+=('')
@@ -1175,8 +1189,9 @@ EOF
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'WezTerm' "${wezterm}" "${HOME}/.config/wezterm/wezterm.lua"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
-        put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
         put_file 'Zsh' "${zshenv}" "${HOME}/.zshenv"
+        put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
+        put_file_if_not_exists 'Zsh' "${zshrclocal}" "${HOME}/.zshrc.local"
 
         # Extract files
         extract_file 'mpv' "${mpv_shaders}" "${HOME}/.config/mpv" "${HOME}/.config/mpv/shaders"
