@@ -414,6 +414,10 @@ eval "$(thefuck --alias fk)"
 
 # Initialize zoxide
 eval "$(zoxide init zsh)"
+unalias z
+function z () {
+    __zoxide_z "$@"
+}
 alias cd='z'
 
 # [ is_linux start ]
