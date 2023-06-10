@@ -935,24 +935,20 @@ EOF
             # Install Conda
             log_info 'Installing Conda...'
             if ! is_dry_run; then
-                curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-${architecture}.sh" >"${tmpdir}/miniconda3.sh"
-                bash "${tmpdir}/miniconda3.sh" -b -p "${HOME}/opt/miniconda3"
-            fi
-
-            # Install Mamba
-            log_info 'Installing Mamba...'
-            if ! is_dry_run; then
-                if [[ -n "${BASH}" ]]; then
-                    eval "$("${HOME}/opt/miniconda3/bin/conda" shell.bash hook)"
-                else
-                    eval "$("${HOME}/opt/miniconda3/bin/conda" shell.zsh hook)"
-                fi
-                conda install mamba -n base -c conda-forge -y
+                curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-${architecture}.sh" >"${tmpdir}/mambaforge-pypy3.sh"
+                bash "${tmpdir}/mambaforge-pypy3.sh" -b -p "${HOME}/opt/mambaforge"
             fi
 
             # Install Snakemake
             log_info 'Installing Snakemake...'
-            is_dry_run || mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
+            if ! is_dry_run; then
+                if [[ -n "${BASH}" ]]; then
+                    eval "$("${HOME}/opt/mambaforge/bin/conda" shell.bash hook)"
+                else
+                    eval "$("${HOME}/opt/mambaforge/bin/conda" shell.zsh hook)"
+                fi
+                mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
+            fi
         fi
 
         # Configure Rust

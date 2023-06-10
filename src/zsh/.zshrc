@@ -418,7 +418,7 @@ alias cd='z'
 
 # [ is_linux start ]
 # Initialize conda
-eval "$("${HOME}/opt/miniconda3/bin/conda" shell.zsh hook)"
+eval "$("${HOME}/opt/mambaforge/bin/conda" shell.zsh hook)"
 
 # Initialize rust
 source "${HOME}/.cargo/env"
