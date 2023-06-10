@@ -921,13 +921,12 @@ main() {
                     mkdir -p "${HOME}/.config/conda"
                     cat >"${HOME}/.config/conda/.condarc" <<'EOF'
     channels:
-    - https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
-    - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
-    - https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/
     - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+    - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
     - https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
     - https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
     - defaults
+    always_yes: true
     show_channel_urls: true
 EOF
                 fi
