@@ -917,7 +917,9 @@ main() {
             # Use mirror for Conda
             if is_true use_mirror; then
                 log_info 'Use USTC mirror for Conda.'
-                is_dry_run || cat >"${HOME}/.condarc" <<'EOF'
+                if ! is_dry_run; then
+                    mkdir -p "${HOME}/.config/conda"
+                    cat >"${HOME}/.config/conda/.condarc" <<'EOF'
     channels:
     - https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
     - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
@@ -928,6 +930,7 @@ main() {
     - defaults
     show_channel_urls: true
 EOF
+                fi
             fi
 
             # Install Conda
