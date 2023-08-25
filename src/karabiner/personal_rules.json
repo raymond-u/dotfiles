@@ -316,6 +316,44 @@
                     ]
                 }
             ]
+        },
+        {
+            "description": "Change hyphen + equal sign to a left-arrow operator in terminals and code editors.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "simultaneous": [
+                            {
+                                "key_code": "hyphen"
+                            },
+                            {
+                                "key_code": "equal_sign"
+                            }
+                        ]
+                    },
+                    "to": [
+                        {
+                            "key_code": "comma",
+                            "modifiers": "left_shift"
+                        },
+                        {
+                            "key_code": "hyphen"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$",
+                                "^com\\.microsoft\\.VSCode$",
+                                "^com\\.jetbrains\\.[a-zA-Z]+"
+                            ]
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }
