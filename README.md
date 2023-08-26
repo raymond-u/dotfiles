@@ -4,12 +4,12 @@ This is my personal dotfiles repository. This collection includes my custom dotf
 
 ## Features
 
-- **Automated OS and Architecture Detection:** The script can identify the operating system and architecture of your machine automatically, ensuring a seamless setup experience.
-- **Versatile Package Management:** Depending on your OS, the script will utilize Nix (for Linux) or Homebrew (for macOS) for package management, providing you with a consistent and streamlined user experience.
-- **Comprehensive Zsh Configuration:** The repository contains a robust Zsh configuration that is feature-packed and ready for use.
-- **Handy Aliases and Functions:** The dotfiles contain my personal selection of aliases and functions, designed to increase productivity and simplify common tasks.
-- **Ready-to-Use Development Environment:** The setup enables a plug'n'play development environment, saving you the hassle of manual configuration.
-- **Self-Updating:** The script is capable of updating itself, ensuring you have the latest features and improvements.
+- Automated OS and Architecture Detection
+- Versatile Package Management
+- Comprehensive Zsh Configuration
+- Handy Aliases and Functions
+- Ready-to-Use Development Environment
+- Self-Updating
 
 ## Compatibility
 
