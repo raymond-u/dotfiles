@@ -914,63 +914,81 @@ main() {
         if ! is_true update; then
             log_section 'Conda Configuration'
 
-            # Use mirror for Conda
-            if is_true use_mirror; then
-                log_info 'Use USTC mirror for Conda.'
-                if ! is_dry_run; then
-                    mkdir -p "${HOME}/.config/conda"
-                    cat >"${HOME}/.config/conda/.condarc" <<'EOF'
-    channels:
-    - https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
-    - https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
-    - https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
-    - https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
-    - defaults
-    always_yes: true
-    show_channel_urls: true
+            # Prompt for installation of Conda
+            prompt_for_yesno 'Do you want to install Mambaforge (Conda), and make separate environments for R and Snakemake?' 'y' _yesno
+            if is_true _yesno; then
+                # Use mirror for Conda
+                if is_true use_mirror; then
+                    log_info 'Use USTC mirror for Conda.'
+                    if ! is_dry_run; then
+                        mkdir -p "${HOME}/.config/conda"
+                        cat >"${HOME}/.config/conda/.condarc" <<'EOF'
+channels:
+- https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/
+- https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/
+- https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
+- https://mirrors.ustc.edu.cn/anaconda/pkgs/free/
+- defaults
+always_yes: true
+show_channel_urls: true
 EOF
+                    fi
+                fi
+
+                # Install Conda
+                log_info 'Installing Conda...'
+                if ! is_dry_run; then
+                    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-${architecture}.sh" >"${tmpdir}/mambaforge-pypy3.sh"
+                    bash "${tmpdir}/mambaforge-pypy3.sh" -b -p "${HOME}/opt/mambaforge"
+
+                    # Activate Conda
+                    if [[ -n "${BASH}" ]]; then
+                        eval "$("${HOME}/opt/mambaforge/bin/conda" shell.bash hook)"
+                    else
+                        eval "$("${HOME}/opt/mambaforge/bin/conda" shell.zsh hook)"
+                    fi
+                fi
+
+                # Install R
+                log_info 'Installing R...'
+                if ! is_dry_run; then
+                    mamba create -n r -c conda-forge -y r-essentials
+                fi
+
+                # Install Snakemake
+                log_info 'Installing Snakemake...'
+                if ! is_dry_run; then
+                    mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
                 fi
             fi
-
-            # Install Conda
-            log_info 'Installing Conda...'
-            if ! is_dry_run; then
-                curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-${architecture}.sh" >"${tmpdir}/mambaforge-pypy3.sh"
-                bash "${tmpdir}/mambaforge-pypy3.sh" -b -p "${HOME}/opt/mambaforge"
-            fi
-
-            # Install Snakemake
-            log_info 'Installing Snakemake...'
-            if ! is_dry_run; then
-                if [[ -n "${BASH}" ]]; then
-                    eval "$("${HOME}/opt/mambaforge/bin/conda" shell.bash hook)"
-                else
-                    eval "$("${HOME}/opt/mambaforge/bin/conda" shell.zsh hook)"
-                fi
-                mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
-            fi
+            unset _yesno
         fi
 
         # Configure Rust
         if ! is_true update; then
             log_section 'Rust Configuration'
 
-            # Connecting to crates is fast enough, so no need to use mirror
-            if is_true use_mirror; then
-                log_info 'Rust does not need to use mirror.'
-            fi
+            # Prompt for installation of Rust
+            prompt_for_yesno 'Do you want to install the Rust toolchain and rust-script?' 'y' _yesno
+            if is_true _yesno; then
+                # Connecting to crates is fast enough, so no need to use a mirror
+                if is_true use_mirror; then
+                    log_info 'Cargo does not require the use of a mirror.'
+                fi
 
-            # Install Rust
-            log_info 'Installing Rust...'
-            if ! is_dry_run; then
-                curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
-                source "${HOME}/.cargo/env"
-                rustup default stable
-            fi
+                # Install Rust
+                log_info 'Installing Rust...'
+                if ! is_dry_run; then
+                    curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
+                    source "${HOME}/.cargo/env"
+                    rustup default stable
+                fi
 
-            # Install rust-script
-            log_info 'Installing rust-script...'
-            is_dry_run || cargo install rust-script
+                # Install rust-script
+                log_info 'Installing rust-script...'
+                is_dry_run || cargo install rust-script
+            fi
+            unset _yesno
         fi
 
         # Set up dotfiles beforehand
