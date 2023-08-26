@@ -4,7 +4,7 @@ in with pkgs;
     # Shells
     inherit bash zsh;
 
-    # Terminal multiplexer
+    # Terminal
     inherit wezterm;
 
     # System commands
@@ -27,4 +27,7 @@ in with pkgs;
 
     # Web
     inherit aria curl httpie openssh qrcp wget;
+
+    # Development
+    inherit poetry;
 }

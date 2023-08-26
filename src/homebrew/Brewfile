@@ -53,10 +53,11 @@ brew "openssh"
 brew "qrcp"
 brew "wget"
 
-# Languages
+# Development
 brew "dotnet"
 brew "node"
 brew "openjdk"
+brew "poetry"
 brew "python"
 brew "r"
 brew "rust"
