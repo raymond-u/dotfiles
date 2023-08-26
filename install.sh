@@ -271,7 +271,7 @@ print_help() {
     echo
     echo 'Supported platforms:'
     echo '  Linux'
-    echo '  macOS (including the arm64 version)'
+    echo '  macOS (compatible with both Intel-based and Apple Silicon machines)'
     echo
     echo 'Options:'
     echo '  -h, --help              Show help message and exit.'
@@ -609,7 +609,7 @@ main() {
                 log_error 'Error: unknown OS.'
                 log_error 'Supported platforms:'
                 log_error '  - Linux'
-                log_error '  - macOS (including the arm64 version)'
+                log_error '  - macOS (compatible with both Intel-based and Apple Silicon machines)'
                 log_error
                 log_error 'You may force the script to run by passing the appropriate argument. For more information, run the script with "-h" or "--help".'
                 exit 1

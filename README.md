@@ -1,28 +1,38 @@
-# Personal dotfiles
+# Dotfiles
 
-This repository contains my personal dotfiles and helper scripts for rule-based templating and age-backed encryption.
+This is my personal dotfiles repository. This collection includes my custom dotfiles and helper scripts designed to provide a simple yet powerful templating and encryption system for dotfiles.
 
-I use Nix as a universal package manager on Linux and Homebrew on macOS. Please note that dotfiles in the `src/` directory must be pre-processed before use.
+## Features
 
-Supported platforms:
+- **Automated OS and Architecture Detection:** The script can identify the operating system and architecture of your machine automatically, ensuring a seamless setup experience.
+- **Versatile Package Management:** Depending on your OS, the script will utilize Nix (for Linux) or Homebrew (for macOS) for package management, providing you with a consistent and streamlined user experience.
+- **Comprehensive Zsh Configuration:** The repository contains a robust Zsh configuration that is feature-packed and ready for use.
+- **Handy Aliases and Functions:** The dotfiles contain my personal selection of aliases and functions, designed to increase productivity and simplify common tasks.
+- **Ready-to-Use Development Environment:** The setup enables a plug'n'play development environment, saving you the hassle of manual configuration.
+- **Self-Updating:** The script is capable of updating itself, ensuring you have the latest features and improvements.
+
+## Compatibility
+
+This repository supports the following platforms:
+
 - Linux
-- macOS (including the arm64 version)
+- macOS (Compatible with both Intel-based and Apple Silicon machines)
 
 ## Installation
 
-This repository can be installed in one line:
+You can install the dotfiles with a single command:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/install.sh)
 ```
 
-If you want to perform a dry run before installing, use the --dry-run flag:
+If you prefer to perform a dry run before the actual installation, you can use the `--dry-run` flag:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/install.sh) --dry-run
 ```
 
-Additional options can be viewed with the following command:
+Additionally, you can view other available options using the `--help` command:
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/install.sh) --help
@@ -30,4 +40,4 @@ bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/inst
 
 ## License
 
-MIT license.
+This repository is licensed under the MIT License.
