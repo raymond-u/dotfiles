@@ -319,7 +319,7 @@ EOF
     if is_true dry_run; then
         echo 'We are in dry run mode. Nothing will be changed.'
     else
-        echo 'It has a dry run mode "-n/--dry-run", in case you are afraid of breaking things.'
+        echo 'We have a dry run mode "-n/--dry-run", in case you are afraid of breaking things.'
     fi
 
     echo
@@ -1231,7 +1231,7 @@ EOF
     # Reload the shell
     prompt_for_continue 'About to reload the shell.'
     echo
-    is_true can_sudo && exec sudo -i -u "${USER}" bash -c "cd '${PWD}'; exec '$(command -v zsh)' -l" || exec "$(command -v zsh)" -l
+    is_true can_sudo && exec sudo -i -u "${USER}" bash -c "cd '${PWD}'; exec '$(command -v zsh)' -l" 2>/dev/null || exec "$(command -v zsh)" -l 2>/dev/null
 }
 
 # Run main logic
