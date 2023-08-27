@@ -823,7 +823,11 @@ main() {
                             :
                         else
                             nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
-                            ! is_true can_sudo || sudo systemctl restart nix-daemon
+                            if is_true can_sudo; then
+                                # Remove redundant channels
+                                sudo -i nix-channel --remove nixpkgs
+                                sudo systemctl restart nix-daemon
+                            fi
                         fi
                     fi
                 fi
