@@ -84,7 +84,7 @@ done
 
 # Check if age exists and is executable
 if [[ ! -x "${path}" ]]; then
-    echo 'Error: age does not exist or is not executable.' >&2
+    echo 'Error: age is not installed or is not executable.' >&2
     exit 0
 fi
 

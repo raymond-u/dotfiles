@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Automate the home environment setup.
+# Automate Raymond's home environment setup.
 
 # Unofficial bash strict mode
 set -euo pipefail
@@ -275,11 +275,7 @@ reminders=()
 print_help() {
     echo 'Usage:'
     echo '  bash install.sh [options...]'
-    echo '  Automate setup of an opinionated home environment composed by Raymond.'
-    echo
-    echo 'Supported platforms:'
-    echo '  Linux'
-    echo '  macOS (compatible with both Intel-based and Apple Silicon machines)'
+    echo "  Automate Raymond's home environment setup."
     echo
     echo 'Options:'
     echo '  -h, --help              Show help message and exit.'
@@ -322,27 +318,27 @@ ______                                      _ _
                                                                     |_|
 
 EOF
-    echo "Welcome! This script will install Raymond's home environment on your machine."
+    echo "Welcome! This script is set to install Raymond's home environment onto your system."
 
     if is_true dry_run; then
-        echo 'We are in dry run mode. Nothing will be changed.'
+        echo 'Dry run mode activated. No changes will be made.'
     else
-        echo 'We have a dry run mode "-n/--dry-run", in case you are afraid of breaking things.'
+        echo 'For the cautious, we offer a dry run mode '-n/--dry-run' to prevent inadvertent changes.'
     fi
 
     echo
 
     if is_true is_linux; then
-        echo 'Linux detected. Nix will be used as the universal package manager.'
+        echo 'Linux environment detected. Nix will be used as the package manager.'
     elif is_true is_macos_arm64; then
-        echo 'macOS arm64 detected. Homebrew will be used as the package manager.'
+        echo 'macOS arm64 environment detected. Homebrew will be used as the package manager.'
     elif is_true is_macos; then
-        echo 'macOS detected. Homebrew will be used as the package manager.'
+        echo 'macOS environment detected. Homebrew will be used as the package manager.'
     fi
 
-    echo "A full-fledged shell setup, common packages, and some tweaks will be installed.${no_color}"
+    echo "Get ready for a comprehensive shell setup, installation of common packages, and ready-to-use development environment.${no_color}"
 
-    prompt_for_continue 'Ready?'
+    prompt_for_continue 'Shall we proceed?'
 }
 
 log_error() {
@@ -599,8 +595,7 @@ main() {
 
     # Quit if OS is specified more than once
     if (( os_flags_counter > 1 )); then
-        log_error 'Error: OS flags should be specified exactly once, if set.'
-        log_error 'Choose the one that best describes the OS.'
+        log_error 'Error: Please ensure OS flags are specified only once, if at all.'
         exit 1
     fi
 
@@ -638,7 +633,7 @@ main() {
                 log_error '  - Linux'
                 log_error '  - macOS (compatible with both Intel-based and Apple Silicon machines)'
                 log_error
-                log_error 'You may force the script to run by passing the appropriate argument. For more information, run the script with "-h" or "--help".'
+                log_error 'You can force the script to run by passing the correct argument. For more details, run the script with "-h" or "--help".'
                 exit 1
                 ;;
         esac
@@ -663,7 +658,7 @@ main() {
     fi
     for _program in "${_prerequisites[@]}"; do
         if [[ -z "$(command -v "${_program}")" ]]; then
-            log_error "Error: \"${_program}\" does not exist."
+            log_error "Error: ${_program} is not installed."
             exit 1
         fi
     done
@@ -768,7 +763,7 @@ main() {
                             exit 0
                         fi
                         unset _yesno
-                        # TODO: Check support for PRoot
+                        # TODO: Support PRoot
                         log_info 'Installing Nix in non-root mode using proot...'
                         curl -L "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
@@ -797,7 +792,7 @@ main() {
                     log_info 'Add USTC mirror as a trusted substituter.'
                     is_dry_run || "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
                 elif is_true use_proot; then
-                    # TODO: Support using PRoot
+                    # TODO: Support PRoot
                     :
                 else
                     if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
@@ -819,7 +814,7 @@ main() {
                         if is_true use_chroot; then
                             "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
                         elif is_true use_proot; then
-                            # TODO: Support using PRoot
+                            # TODO: Support PRoot
                             :
                         else
                             nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
@@ -856,7 +851,7 @@ main() {
                 if is_true use_chroot; then
                     "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
                 elif is_true use_proot; then
-                    # TODO: Support using PRoot
+                    # TODO: Support PRoot
                     :
                 fi
             fi
@@ -913,7 +908,7 @@ main() {
                 if is_true use_chroot; then
                     "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'tldr -u'
                 elif is_true use_proot; then
-                    # TODO: Support using PRoot
+                    # TODO: Support PRoot
                     :
                 fi
             fi
@@ -1266,9 +1261,9 @@ EOF
     fi
     unset _reminder
     echo
-    ! is_true update || log_info 'You might want to update zinit and neovim plugins manually.'
-    log_info "A complete log has been saved to ${log_file}."
-    log_info 'Use the "home-env" command to manage the installed home environment.'
+    ! is_true update || log_info 'You may consider updating Neovim and Zinit plugins manually.'
+    log_info "The complete log has been saved to ${log_file}."
+    log_info 'To manage the installed home environment, use the "home-env" command.'
 
     # Clean up
     clean_up
