@@ -33,8 +33,9 @@ hushlogin=src/misc/.hushlogin
 karabiner_rules=src/karabiner/personal_rules.json
 mpv_conf=src/mpv/mpv.conf
 mpv_input=src/mpv/input.conf
-mpv_shaders=src/mpv/shaders.tar.gz
+mpv_shaders=src/mpv/shaders
 nix_env=src/nix/env.nix
+nvchad=src/nvchad/custom
 p10k=src/powerlevel10k/p10k.zsh
 passage_archive=src/passage/archive.age
 ssh_archive=src/ssh/archive.age
@@ -446,7 +447,7 @@ put_file() {
     log_info "Put $1 config file to $3."
 
     if ! is_dry_run; then
-        if [[ -f "$3" ]]; then
+        if [[ -e "$3" ]]; then
             if ! is_true update; then
                 log_info "$1 config file already exists. Rename it to $3.old."
                 reminders+=("$1: Old config file lingers in $3.old.")
@@ -461,7 +462,7 @@ put_file() {
 }
 
 put_file_if_not_exists() {
-    if ! [[ -f "$3" ]]; then
+    if ! [[ -e "$3" ]]; then
         log_info "Put $1 config file to $3."
 
         if ! is_dry_run; then
@@ -471,20 +472,39 @@ put_file_if_not_exists() {
     fi
 }
 
-extract_file() {
-    log_info "Extract $1 config files to $4."
+put_folder() {
+    log_info "Put $1 config files to $3."
 
     if ! is_dry_run; then
-        mkdir -p "$3"
-        tar -xzC "$3" -f "$2"
+        if [[ -e "$3" ]]; then
+            if ! is_true update; then
+                log_info "$1 config files already exists. Rename it to $3.old."
+                reminders+=("$1: Old config files lingers in $3.old.")
+                mv "$3" "$3.old"
+            else
+                rm -rf "$3"
+            fi
+        else
+            mkdir -p "$(dirname "$3")"
+        fi
+
+        cp -r "$2" "$3"
     fi
 }
 
-extract_encrypted_file() {
+put_encrypted_file() {
     if is_true has_identity; then
-        log_info "Extract $1 config files to $4."
+        log_info "Put $1 config files to $4."
 
         if ! is_dry_run; then
+            if [[ -e "$4" ]]; then
+                if ! is_true update; then
+                    log_info "$1 config files already exists. Rename it to $4.old."
+                    reminders+=("$1: Old config files lingers in $4.old.")
+                    mv "$4" "$4.old"
+                fi
+            fi
+
             mkdir -p "$3"
             bash "${crypto}" -p "$(command -v age)" -d -i "${identity_file}" <<<"$(<"$2") ${passphrase}" | base64 -d | tar -xzC "$3"
         fi
@@ -1007,6 +1027,7 @@ EOF
         put_file 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
         put_file 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"
         put_file 'login' "${hushlogin}" "${HOME}/.hushlogin"
+        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim/lua/custom"
         put_file 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
@@ -1181,9 +1202,6 @@ EOF
                 fi
             fi
 
-            # Set up passage store
-            extract_encrypted_file 'passage' "${passage_archive}" "${HOME}/.passage" "${HOME}/.passage/store"
-
             # Move the identity file
             if [[ "${identity_file}" != "${HOME}/.passage/identities" ]]; then
                 prompt_for_yesno "Do you want to move the identity file to ${HOME}/.passage/identities?" 'y' _yesno
@@ -1202,6 +1220,7 @@ EOF
         log_section 'Dotfiles Setup'
         put_file 'Aria2' "${aria2}" "${HOME}/.config/aria2/aria2.conf"
         put_file 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
+        put_encrypted_file 'Clash' "${clash_archive}" "${HOME}/.config" "${HOME}/.config/clash"
         put_file 'direnv' "${direnvrc}" "${HOME}/.config/direnv/direnvrc"
         put_file 'Git' "${gitconfig}" "${HOME}/.config/git/config"
         put_file 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
@@ -1210,20 +1229,17 @@ EOF
         put_file 'login' "${hushlogin}" "${HOME}/.hushlogin"
         put_file 'mpv' "${mpv_conf}" "${HOME}/.config/mpv/mpv.conf"
         put_file 'mpv' "${mpv_input}" "${HOME}/.config/mpv/input.conf"
+        put_folder 'mpv' "${mpv_shaders}" "${HOME}/.config/mpv/shaders"
+        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim/lua/custom"
+        put_encrypted_file 'passage' "${passage_archive}" "${HOME}/.passage" "${HOME}/.passage/store"
         put_file 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
+        put_encrypted_file 'SSH' "${ssh_archive}" "${HOME}" "${HOME}/.ssh"
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'WezTerm' "${wezterm}" "${HOME}/.config/wezterm/wezterm.lua"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
         put_file 'Zsh' "${zshenv}" "${HOME}/.zshenv"
         put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
         put_file_if_not_exists 'Zsh' "${zshrclocal}" "${HOME}/.zshrc.local"
-
-        # Extract files
-        extract_file 'mpv' "${mpv_shaders}" "${HOME}/.config/mpv" "${HOME}/.config/mpv/shaders"
-
-        # Extract encrypted files
-        extract_encrypted_file 'SSH' "${ssh_archive}" "${HOME}" "${HOME}/.ssh"
-        extract_encrypted_file 'Clash' "${clash_archive}" "${HOME}/.config" "${HOME}/.config/clash"
 
         # Reminders for macOS
         if is_true has_identity; then
