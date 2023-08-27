@@ -446,7 +446,7 @@ put_file() {
         if [[ -e "$3" ]]; then
             if ! is_true update; then
                 log_info "$1 config file already exists. Rename it to $3.old."
-                reminders+=("$1: Old config file lingers in $3.old.")
+                reminders+=("$1: old config file lingers in $3.old.")
                 mv "$3" "$3.old"
             fi
         else
@@ -474,8 +474,8 @@ put_folder() {
     if ! is_dry_run; then
         if [[ -e "$3" ]]; then
             if ! is_true update; then
-                log_info "$1 config files already exists. Rename it to $3.old."
-                reminders+=("$1: Old config files lingers in $3.old.")
+                log_info "$1 config directory already exists. Rename it to $3.old."
+                reminders+=("$1: old config files linger in $3.old.")
                 mv "$3" "$3.old"
             else
                 rm -rf "$3"
@@ -495,8 +495,8 @@ put_encrypted_file() {
         if ! is_dry_run; then
             if [[ -e "$4" ]]; then
                 if ! is_true update; then
-                    log_info "$1 config files already exists. Rename it to $4.old."
-                    reminders+=("$1: Old config files lingers in $4.old.")
+                    log_info "$1 config directory already exists. Rename it to $4.old."
+                    reminders+=("$1: old config files linger in $4.old.")
                     mv "$4" "$4.old"
                 fi
             fi
@@ -595,7 +595,7 @@ main() {
 
     # Quit if OS is specified more than once
     if (( os_flags_counter > 1 )); then
-        log_error 'Error: Please ensure OS flags are specified only once, if at all.'
+        log_error 'Error: please ensure OS flags are specified only once, if at all.'
         exit 1
     fi
 
@@ -753,8 +753,8 @@ main() {
                             mv "${tmpdir}/nix-user-chroot" "${HOME}/bin"
                         fi
                         use_chroot=true
-                        reminders+=("nix-user-chroot: The binary has been installed to ${HOME}/bin.")
-                        reminders+=('nix-user-chroot: Note that you can only use Nix and the installed packages within the shell started by "nix-user-chroot ~/.nix bash".')
+                        reminders+=("nix-user-chroot: the binary has been installed to ${HOME}/bin.")
+                        reminders+=('nix-user-chroot: note that you can only use Nix and the installed packages within the shell started by "nix-user-chroot ~/.nix bash".')
                         ;;
                     proot)
                         prompt_for_yesno "Nix must be installed using PRoot, but support for PRoot is not complete and haven't been tested. Do you still want to continue?" 'n' _yesno
@@ -763,7 +763,7 @@ main() {
                             exit 0
                         fi
                         unset _yesno
-                        # TODO: Support PRoot
+                        # TODO: support PRoot
                         log_info 'Installing Nix in non-root mode using proot...'
                         curl -L "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
@@ -778,8 +778,8 @@ main() {
                             mv "${tmpdir}/proot" "${HOME}/bin"
                         fi
                         use_proot=true
-                        reminders+=("PRoot: The binary has been installed to ${HOME}/bin.")
-                        reminders+=('PRoot: Note that you can only use Nix and the installed packages within the shell started by "proot -b ~/.nix:/nix".')
+                        reminders+=("PRoot: the binary has been installed to ${HOME}/bin.")
+                        reminders+=('PRoot: note that you can only use Nix and the installed packages within the shell started by "proot -b ~/.nix:/nix".')
                         ;;
                 esac
                 unset _nix_installation
@@ -792,7 +792,7 @@ main() {
                     log_info 'Add USTC mirror as a trusted substituter.'
                     is_dry_run || "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
                 elif is_true use_proot; then
-                    # TODO: Support PRoot
+                    # TODO: support PRoot
                     :
                 else
                     if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
@@ -814,7 +814,7 @@ main() {
                         if is_true use_chroot; then
                             "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
                         elif is_true use_proot; then
-                            # TODO: Support PRoot
+                            # TODO: support PRoot
                             :
                         else
                             nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
@@ -851,7 +851,7 @@ main() {
                 if is_true use_chroot; then
                     "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
                 elif is_true use_proot; then
-                    # TODO: Support PRoot
+                    # TODO: support PRoot
                     :
                 fi
             fi
@@ -865,7 +865,7 @@ main() {
             log_info 'Installing Zinit...'
             is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
             reminders+=('Zinit: Zinit will self-update when the shell reloads.')
-            reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
+            reminders+=('Zinit: you can run "zinit self-update" to compile Zinit (optional).')
 
             # Change the login shell to Zsh
             if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then
@@ -896,7 +896,7 @@ main() {
         fi
         if is_true use_chroot; then
             reminders+=('WezTerm: "WezTerm connect" won'\''t work if installed with nix-user-chroot.')
-            reminders+=("WezTerm: Build WezTerm from source or use it in AppImage format.")
+            reminders+=("WezTerm: build WezTerm from source or use it in AppImage format.")
         fi
 
         # Configure tealdeer
@@ -908,7 +908,7 @@ main() {
                 if is_true use_chroot; then
                     "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'tldr -u'
                 elif is_true use_proot; then
-                    # TODO: Support PRoot
+                    # TODO: support PRoot
                     :
                 fi
             fi
@@ -1139,7 +1139,7 @@ EOF
             log_info 'Installing Zinit...'
             is_dry_run || NO_EDIT=1 NO_TUTORIAL=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/zdharma-continuum/zinit/HEAD/scripts/install.sh)"
             reminders+=('Zinit: Zinit will self-update when the shell reloads.')
-            reminders+=('Zinit: You can run "zinit self-update" to compile Zinit (optional).')
+            reminders+=('Zinit: you can run "zinit self-update" to compile Zinit (optional).')
 
             # Change the login shell to Zsh
             if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then

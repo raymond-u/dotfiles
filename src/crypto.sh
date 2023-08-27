@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Encrypt or decrypt strings, using key files. Read passphrase from stdin if possible.
+# Encrypt or decrypt strings, using a key file. Read passphrase from stdin if possible.
 #
 # A passphrase can be followed after the input data, with a space present as the delimiter.
 # Encrypt: encrypt with age -> encode with base64
@@ -18,7 +18,7 @@ set -euo pipefail
 print_help() {
     echo 'Usage:'
     echo '  crypto.sh [options...] -p path [-r string] [-i path]'
-    echo '  Encrypt or decrypt strings using key files.'
+    echo '  Encrypt or decrypt strings, using a key file.'
     echo
     echo 'Options:'
     echo '  -h, --help              Show help message and exit.'
@@ -28,9 +28,9 @@ print_help() {
     echo '  -d, --decrypt           Decrypt input and write to output.'
     echo '  -i, --identity          Set the identity file for decryption.'
     echo
-    echo 'A passphrase can follow the input data, separated by a space.'
-    echo 'Encryption: Encrypt with age -> Encode using Base64'
-    echo 'Decryption: Decode using Base64 -> Decrypt with age'
+    echo 'A passphrase can be followed after the input data, with a space present as the delimiter.'
+    echo 'Encrypt: encrypt with age -> encode with base64'
+    echo 'Decrypt: decode with base64 -> decrypt with age'
 }
 
 #################################
