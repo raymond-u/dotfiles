@@ -227,8 +227,6 @@ alias reload='echo; exec sudo -i -u "${USER}" bash -c "cd \"${PWD}\"; exec \"${S
 # [ ! can_sudo start ]
 alias reload='echo; exec "${SHELL}" -l'
 # [ ! can_sudo end ]
-alias lanip='ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"'
-alias pubip='curl ipinfo.io/ip; echo'
 # [ is_macos start ]
 alias hosts='nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
@@ -334,6 +332,17 @@ port() {
     fi
 }
 # [ can_sudo end ]
+lanip() {
+    if [[ -n "$(command -v ifconfig)" ]]; then
+        ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"
+    else
+        ip addr | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"
+    fi
+}
+pubip() {
+    curl ipinfo.io/ip
+    echo
+}
 weather() {
     curl -fsS 'wttr.in/'"$1"'?mMAF'
 }
