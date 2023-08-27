@@ -206,6 +206,9 @@ nix_pkgs=(
     '  wget'
     ''
     '# Development'
+    '  dotnet-sdk'
+    '  nodejs'
+    '  openjdk'
     '  poetry'
 )
 
