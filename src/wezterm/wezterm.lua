@@ -225,7 +225,18 @@ wezterm.on(
 local config = wezterm.config_builder()
 config:set_strict_mode(true)
 
-config.set_environment_variables = { PATH = wezterm.executable_dir .. ":" .. os.getenv("PATH") }
+config.set_environment_variables = {
+    PATH = wezterm.executable_dir .. ":" .. os.getenv("PATH"),
+}
+
+config.colors = {
+    tab_bar = {
+        background = "black",
+        inactive_tab_hover = { bg_color = "black", fg_color = "black", italic = false },
+        new_tab = { bg_color = "black", fg_color = "bisque", intensity = "Bold" },
+        new_tab_hover = { bg_color = "black", fg_color = "gold", intensity = "Bold" },
+    },
+}
 
 config.font_rules = {
     { intensity = "Normal", italic = false, font = get_font_config { "Bold", "DemiBold" } },
@@ -419,6 +430,7 @@ config.key_tables = {
         },
     },
 }
+
 config.mouse_bindings = {
     {
         event = { Down = { streak = 4, button = "Left" } },
@@ -429,14 +441,6 @@ config.mouse_bindings = {
         event = { Down = { streak = 1, button = "Right" } },
         mods = "",
         action = wezterm.action.PasteFrom("Clipboard"),
-    },
-}
-
-config.colors = {
-    tab_bar = {
-        background = "black",
-        new_tab = { bg_color = "black", fg_color = "bisque", intensity = "Bold" },
-        new_tab_hover = { bg_color = "black", fg_color = "gold", intensity = "Bold" },
     },
 }
 
