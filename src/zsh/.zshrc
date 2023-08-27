@@ -8,11 +8,6 @@ else
 fi
 # [ use_chroot end ]
 
-# Enable Powerlevel10k instant prompt
-if [[ -r "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
-    source "${HOME}/.cache/p10k-instant-prompt-${(%):-%n}.zsh"
-fi
-
 # Use emacs key bindings
 bindkey -e
 
