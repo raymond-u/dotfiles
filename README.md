@@ -40,4 +40,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/inst
 
 ## License
 
-This repository is licensed under the MIT License.
+This repository is licensed under the MIT License. See [LICENSE](LICENSE) for more details.
+
+This repository incorporates materials from other projects. See [THIRDPARTY.md](THIRDPARTY.md) for more details.
