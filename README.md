@@ -2,10 +2,6 @@
 
 This is my personal dotfiles repository. This collection includes my custom dotfiles and helper scripts designed to provide a simple yet powerful templating and encryption system for dotfiles.
 
-## Showcase
-
-<img alt="image" src="https://github.com/raymond-u/dotfiles/assets/36328498/eb1d153e-2f88-4772-a187-fc88d3105fd6">
-
 ## Features
 
 - Automated OS and Architecture Detection
@@ -41,6 +37,10 @@ Additionally, you can view other available options using the `--help` command:
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/raymond-u/dotfiles/HEAD/install.sh) --help
 ```
+
+## Showcase
+
+<img width="697" alt="image" src="https://github.com/raymond-u/dotfiles/assets/36328498/eb1d153e-2f88-4772-a187-fc88d3105fd6">
 
 ## License
 
