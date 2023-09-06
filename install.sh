@@ -355,8 +355,8 @@ log_section() {
 }
 
 prompt_for_continue() {
-    local _dummy
-    read -srp $'\n'"${yellow}$1 Press any key to continue. >${no_color}" -n1 _dummy
+    local _
+    read -srp $'\n'"${yellow}$1 Press any key to continue. >${no_color}" -n1 _
     echo
 }
 
@@ -580,7 +580,7 @@ main() {
             -*)
                 log_error "Error: unknown flag \"$1\"."
                 print_help
-                exit 0
+                exit 1
                 ;;
             *)
                 if [[ ! "${config_flags[*]}" =~ "$1" ]]; then
