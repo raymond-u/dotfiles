@@ -11,7 +11,7 @@ in with pkgs;
     inherit coreutils findutils gawk gnused less;
 
     # General commands
-    inherit bat exa fd fzf hexyl ripgrep tree zoxide;
+    inherit bat eza fd fzf hexyl ripgrep zoxide;
 
     # System utilities
     inherit bottom duf htop ncdu neofetch procs;

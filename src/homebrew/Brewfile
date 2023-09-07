@@ -12,12 +12,11 @@ brew "less"
 
 # General commands
 brew "bat"
-brew "exa"
+brew "eza"
 brew "fd"
 brew "fzf"
 brew "hexyl"
 brew "ripgrep"
-brew "tree"
 brew "zoxide"
 
 # System utilities
