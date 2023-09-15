@@ -695,7 +695,7 @@ main() {
     if is_true is_linux; then
         # Create empty folders
         log_info 'Create empty folders in the home directory.'
-        is_dry_run || mkdir -p "${HOME}/"{bin,downloads,opt,playground} "${HOME}/.local/state/"{less,zsh}
+        is_dry_run || mkdir -p "${HOME}/"{bin,downloads,opt,playground,share/man} "${HOME}/.local/state/"{less,zsh}
 
         # Configure Nix
         if ! is_true update; then
@@ -1040,7 +1040,7 @@ EOF
     elif is_true is_macos; then
         # Create empty folders
         log_info 'Create empty folders in the home directory.'
-        is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt} "${HOME}/.local/state/"{less,zsh} "${HOME}/Developer" "${HOME}/Playground"
+        is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt,share/man} "${HOME}/.local/state/"{less,zsh} "${HOME}/Developer" "${HOME}/Playground"
 
         # Prompt for the identity file
         is_true has_identity || prompt_for_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity
