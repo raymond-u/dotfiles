@@ -47,6 +47,10 @@ local function capitalize(str)
     return (str:gsub("^%l", string.upper))
 end
 
+local function get_domain_name(str)
+    return str:gsub("^[A-Z]*MUX:", "")
+end
+
 local function get_process_name(str)
     return str:gsub("^.*[/\\]", ""):gsub("%.exe$", "")
 end
@@ -99,9 +103,10 @@ wezterm.on(
 
         if tab.active_pane.foreground_process_name == "" then
             if tab.active_pane.domain_name == "local" then
-                title_with_icon = TASK_PENDING_ICON .. " unknown"
+                title_with_icon = TASK_PENDING_ICON .. " ..."
             else
-                title_with_icon = SSH_DOMAIN .. " " .. tab.active_pane.domain_name
+                domain_name = get_domain_name(tab.active_pane.domain_name)
+                title_with_icon = SSH_DOMAIN .. " " .. domain_name
             end
         else
             exec_name = get_process_name(tab.active_pane.foreground_process_name)
