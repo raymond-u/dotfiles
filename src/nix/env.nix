@@ -23,7 +23,7 @@ in with pkgs;
     inherit chafa;
 
     # Text editors
-    inherit nano neovim vim;
+    inherit nano neovim;
 
     # Web
     inherit aria curl httpie openssh qrcp wget;

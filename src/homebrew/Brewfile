@@ -43,7 +43,6 @@ brew "chafa"
 # Text editors
 brew "nano"
 brew "neovim"
-brew "vim"
 
 # Web
 brew "aria2"
