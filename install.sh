@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.2'
+version='0.8.3'
 
 # Scripts
 crypto=src/crypto.sh
@@ -105,7 +105,7 @@ brew_pkgs=(
     '  dotnet'
     '  node'
     '  openjdk'
-    '  poetry'
+    '  pipx'
     '  python'
     '  r'
     '  rust'
@@ -206,7 +206,7 @@ nix_pkgs=(
     '  dotnet-sdk'
     '  nodejs'
     '  openjdk'
-    '  poetry'
+    '  pipx'
 )
 
 # Colors
@@ -895,6 +895,22 @@ main() {
             reminders+=("WezTerm: build WezTerm from source or use it in AppImage format.")
         fi
 
+        # Install with pipx
+        log_info 'Installing apps with pipx...'
+        log_info 'Installing Poetry...'
+        if ! is_dry_run; then
+            if [[ -n "$(command -v pipx)" ]]; then
+                pipx install poetry
+            else
+                if is_true use_chroot; then
+                    "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'pipx install poetry'
+                elif is_true use_proot; then
+                    # TODO: support PRoot
+                    :
+                fi
+            fi
+        fi
+
         # Configure tealdeer
         log_info 'Fetch caches for tealdeer.'
         if ! is_dry_run; then
@@ -1154,6 +1170,11 @@ EOF
             mkdir -p "${HOME}/.config/wezterm"
             curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
         fi
+
+        # Install with pipx
+        log_info 'Installing apps with pipx...'
+        log_info 'Installing Poetry...'
+        is_dry_run || pipx install poetry
 
         # Configure tealdeer
         log_info 'Fetch caches for tealdeer.'
