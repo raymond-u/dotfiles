@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.3'
+version='0.8.4'
 
 # Scripts
 crypto=src/crypto.sh
@@ -102,6 +102,7 @@ brew_pkgs=(
     '  wget'
     ''
     '# Development'
+    '  corepack'
     '  dotnet'
     '  node'
     '  openjdk'
@@ -203,6 +204,7 @@ nix_pkgs=(
     '  wget'
     ''
     '# Development'
+    '  corepack'
     '  dotnet-sdk'
     '  nodejs'
     '  openjdk'
@@ -409,6 +411,21 @@ get_package_list() {
             printf '%s' "$(join_by_newline "${brew_pkgs[@]}")" $'\n\n----- GUI Applications -----\n\n' "$(join_by_newline "${cask_pkgs[@]}")"
         else
             printf '%s' "$(join_by_newline "${brew_pkgs[@]}")"
+        fi
+    fi
+}
+
+run_with_nix() {
+    if ! is_dry_run; then
+        if [[ -n "$(command -v "${1%% *}")" ]]; then
+            eval "$1"
+        else
+            if is_true use_chroot; then
+                "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc "$1"
+            elif is_true use_proot; then
+                # TODO: support PRoot
+                :
+            fi
         fi
     fi
 }
@@ -840,17 +857,7 @@ main() {
             fi
 
             # Might already have nix in PATH when updating
-            if [[ -n "$(command -v nix-env)" ]]; then
-                nix-channel --update
-                nix-env -i -f "${nix_env}"
-            else
-                if is_true use_chroot; then
-                    "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
-                elif is_true use_proot; then
-                    # TODO: support PRoot
-                    :
-                fi
-            fi
+            run_with_nix "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
         fi
 
         # Configure Zsh
@@ -896,35 +903,18 @@ main() {
         fi
 
         # Install with pipx
-        log_info 'Installing apps with pipx...'
-        log_info 'Installing Poetry...'
-        if ! is_dry_run; then
-            if [[ -n "$(command -v pipx)" ]]; then
-                pipx install poetry
-            else
-                if is_true use_chroot; then
-                    "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'pipx install poetry'
-                elif is_true use_proot; then
-                    # TODO: support PRoot
-                    :
-                fi
-            fi
+        if is_true update; then
+            log_info 'Updating packages with pipx...'
+            run_with_nix 'pipx upgrade-all'
+        else
+            log_info 'Installing packages with pipx...'
+            log_info 'Installing Poetry...'
+            run_with_nix 'pipx install poetry'
         fi
 
         # Configure tealdeer
         log_info 'Fetch caches for tealdeer.'
-        if ! is_dry_run; then
-            if [[ -n "$(command -v tldr)" ]]; then
-                tldr -u
-            else
-                if is_true use_chroot; then
-                    "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'tldr -u'
-                elif is_true use_proot; then
-                    # TODO: support PRoot
-                    :
-                fi
-            fi
-        fi
+        run_with_nix 'tldr --update'
 
         # Configure Neovim
         if ! is_true update; then
@@ -1000,6 +990,15 @@ EOF
                 fi
             fi
             unset _yesno
+        fi
+
+        # Configure Node.js
+        if ! is_true update; then
+            log_section 'Node.js Configuration'
+
+            # Enable corepack
+            log_info 'Enable corepack.'
+            run_with_nix 'corepack enable'
         fi
 
         # Configure Rust
@@ -1172,13 +1171,18 @@ EOF
         fi
 
         # Install with pipx
-        log_info 'Installing apps with pipx...'
-        log_info 'Installing Poetry...'
-        is_dry_run || pipx install poetry
+        if is_true update; then
+            log_info 'Updating packages with pipx...'
+            is_dry_run || pipx upgrade-all
+        else
+            log_info 'Installing packages with pipx...'
+            log_info 'Installing Poetry...'
+            is_dry_run || pipx install poetry
+        fi
 
         # Configure tealdeer
         log_info 'Fetch caches for tealdeer.'
-        is_dry_run || tldr -u
+        is_dry_run || tldr --update
 
         # Configure Neovim
         if ! is_true update; then
@@ -1200,6 +1204,15 @@ EOF
                 reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
             fi
             unset _yesno
+        fi
+
+        # Configure Node.js
+        if ! is_true update; then
+            log_section 'Node.js Configuration'
+
+            # Enable corepack
+            log_info 'Enable corepack.'
+            is_dry_run || corepack enable
         fi
 
         # Configure passage

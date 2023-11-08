@@ -29,5 +29,5 @@ in with pkgs;
     inherit aria curl httpie openssh qrcp wget;
 
     # Development
-    inherit dotnet-sdk nodejs openjdk pipx;
+    inherit corepack dotnet-sdk nodejs openjdk pipx;
 }

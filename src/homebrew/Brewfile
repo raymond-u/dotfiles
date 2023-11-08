@@ -52,6 +52,7 @@ brew "qrcp"
 brew "wget"
 
 # Development
+brew "corepack"
 brew "dotnet"
 brew "node"
 brew "openjdk"
