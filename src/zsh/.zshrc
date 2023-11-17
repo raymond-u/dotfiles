@@ -10,6 +10,8 @@ fi
 
 # Use emacs key bindings
 bindkey -e
+bindkey '^B' backward-word
+bindkey '^F' forward-word
 
 # Set zsh options
 setopt APPEND_HISTORY         # Append to history instead of replacing it

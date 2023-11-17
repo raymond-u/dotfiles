@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.4'
+version='0.8.5'
 
 # Scripts
 crypto=src/crypto.sh
