@@ -26,7 +26,7 @@ in with pkgs;
     inherit nano neovim;
 
     # Web
-    inherit aria curl httpie openssh qrcp wget;
+    inherit aria curl openssh qrcp wget xh;
 
     # Development
     inherit corepack dotnet-sdk nodejs openjdk pipx;

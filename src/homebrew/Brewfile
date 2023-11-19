@@ -46,10 +46,10 @@ brew "neovim"
 
 # Web
 brew "aria2"
-brew "httpie"
 brew "openssh"
 brew "qrcp"
 brew "wget"
+brew "xh"
 
 # Development
 brew "corepack"
