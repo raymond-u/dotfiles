@@ -173,14 +173,6 @@ export TASKRC="${HOME}/.config/task/taskrc"
 # Configure wget
 export WGETRC="${HOME}/.config/wget/wgetrc"
 
-# [ is_linux start ]
-# Add missing locale for nix packages
-# Uncomment this if locale of nix packages is broken
-# export LOCALE_ARCHIVE_2_11="$(nix-build --no-out-link '<nixpkgs>' -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE_2_27="$(nix-build --no-out-link '<nixpkgs>' -A glibcLocales)/lib/locale/locale-archive"
-# export LOCALE_ARCHIVE=/usr/bin/locale
-# [ is_linux end ]
-
 # Aliases for system commands
 alias c='cat'
 alias cat='bat --pager "less -RXFe"'
