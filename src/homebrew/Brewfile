@@ -17,6 +17,7 @@ brew "fd"
 brew "fzf"
 brew "hexyl"
 brew "ripgrep"
+brew "sd"
 brew "zoxide"
 
 # System utilities

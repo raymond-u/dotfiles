@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.6'
+version='0.8.7'
 
 # Scripts
 crypto=src/crypto.sh
@@ -67,6 +67,7 @@ brew_pkgs=(
     '  fzf'
     '  hexyl'
     '  ripgrep'
+    '  sd'
     '  zoxide'
     ''
     '# System Utilities'
@@ -166,6 +167,7 @@ nix_pkgs=(
     '  fzf'
     '  hexyl'
     '  ripgrep'
+    '  sd'
     '  zoxide'
     ''
     '# System Utilities'
