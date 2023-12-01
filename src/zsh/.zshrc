@@ -93,7 +93,7 @@ zstyle ':fzf-tab:*'                                                       single
 
 # Fzf-tab preview
 zstyle ':fzf-tab:complete:*'                                              fzf-flags --preview-window=wrap
-zstyle ':fzf-tab:complete:(cp|mv|rm|exa|bat|nvim):argument-rest'          fzf-preview '[[ -d "${realpath}" ]] && exa -1 --icons --group-directories-first "${realpath}" || bat --color always --style grid,numbers -r :200 "${realpath}"'
+zstyle ':fzf-tab:complete:(cp|mv|rm|eza|bat|nvim):argument-rest'          fzf-preview '[[ -d "${realpath}" ]] && eza -1 --icons --group-directories-first "${realpath}" || bat --color always --style grid,numbers -r :200 "${realpath}"'
 zstyle ':fzf-tab:complete:(-parameter-|-brace-parameter-|export|unset):*' fzf-preview 'echo "${(P)word}"'
 # [ is_linux start ]
 zstyle ':fzf-tab:complete:systemctl-*:*'                                  fzf-preview 'SYSTEMD_COLORS=1 systemctl status "${word}"'
@@ -183,8 +183,8 @@ alias grep='rg'
 alias l='ls'
 alias la='ls -la'
 alias ll='ls -laF'
-alias ls='exa --icons --group-directories-first'
-alias lsd='exa -D --icons'
+alias ls='eza --icons --group-directories-first'
+alias lsd='eza -D --icons'
 alias le='less'
 alias less='bat --pager "less -R --mouse" --color always --style grid,numbers'
 alias mkdir='mkdir -p'
