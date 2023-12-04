@@ -195,11 +195,11 @@ alias xxd='hexyl'
 
 # Aliases for user commands
 # [ is_linux start ]
-alias conac='conda activate'
-alias conde='conda deactivate'
-alias conls='conda env list'
-alias concr='conda create -n'
-alias conre='conda remove -n'
+alias conac='mamba activate'
+alias conde='mamba deactivate'
+alias conls='mamba env list'
+alias concr='mamba create -n'
+alias conre='mamba remove -n'
 alias conin='mamba install'
 alias conun='mamba remove'
 # [ is_linux end ]
