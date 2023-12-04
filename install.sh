@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.7'
+version='0.8.8'
 
 # Scripts
 crypto=src/crypto.sh
@@ -968,8 +968,8 @@ EOF
                 # Install Conda
                 log_info 'Installing Conda...'
                 if ! is_dry_run; then
-                    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-pypy3-Linux-${architecture}.sh" >"${tmpdir}/mambaforge-pypy3.sh"
-                    bash "${tmpdir}/mambaforge-pypy3.sh" -b -p "${HOME}/opt/mambaforge"
+                    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-${architecture}.sh" >"${tmpdir}/mambaforge.sh"
+                    bash "${tmpdir}/mambaforge.sh" -b -p "${HOME}/opt/mambaforge"
 
                     # Activate Conda
                     if [[ -n "${BASH}" ]]; then
