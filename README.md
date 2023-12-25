@@ -1,15 +1,15 @@
 # Dotfiles
 
-This is my personal dotfiles repository. This collection includes my custom dotfiles and helper scripts designed to provide a simple yet powerful templating and encryption system for dotfiles.
+This repository holds my personal dotfiles. It also includes some custom scripts that provide a simple yet powerful templating and encryption framework for text files.
 
 ## Features
 
-- Automated OS and Architecture Detection
-- Versatile Package Management
-- Comprehensive Zsh Configuration
-- Handy Aliases and Functions
-- Ready-to-Use Development Environment
-- Self-Updating
+- Automated OS and architecture detection
+- Versatile package management
+- Comprehensive Zsh configuration
+- Handy aliases and functions
+- Various development environments
+- Self-update capability
 
 ## Compatibility
 
