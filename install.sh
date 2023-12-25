@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.8.8'
+version='0.9.0'
 
 # Scripts
 crypto=src/crypto.sh
@@ -30,7 +30,7 @@ gitconfig=src/git/config
 gitignore=src/git/ignore
 htoprc=src/htop/htoprc
 hushlogin=src/misc/.hushlogin
-karabiner_rules=src/karabiner/personal_rules.json
+karabiner_rules=src/karabiner/my_rules.json
 mpv_conf=src/mpv/mpv.conf
 mpv_input=src/mpv/input.conf
 mpv_shaders=src/mpv/shaders
@@ -42,6 +42,7 @@ ssh_archive=src/ssh/archive.age
 taskrc=src/taskwarrior/taskrc
 wezterm=src/wezterm/wezterm.lua
 wgetrc=src/wget/wgetrc
+yabairc=src/yabai/yabairc
 zshenv=src/zsh/.zshenv
 zshrc=src/zsh/.zshrc
 zshrclocal=src/zsh/.zshrc.local
@@ -87,6 +88,9 @@ brew_pkgs=(
     '  task'
     '  tealdeer'
     '  thefuck'
+    ''
+    '# Services'
+    '  yabai'
     ''
     '# Media Viewers'
     '  chafa'
@@ -1268,6 +1272,7 @@ EOF
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'WezTerm' "${wezterm}" "${HOME}/.config/wezterm/wezterm.lua"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
+        put_file 'Yabai' "${yabairc}" "${HOME}/.config/yabai/yabairc"
         put_file 'Zsh' "${zshenv}" "${HOME}/.zshenv"
         put_file 'Zsh' "${zshrc}" "${HOME}/.zshrc"
         put_file_if_not_exists 'Zsh' "${zshrclocal}" "${HOME}/.zshrc.local"

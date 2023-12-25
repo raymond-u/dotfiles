@@ -1,161 +1,6 @@
 {
-    "title": "Personal rules",
+    "title": "My rules",
     "rules": [
-        {
-            "description": "Convert double-space to \" | \" in terminal emulator apps.",
-            "manipulators": [
-                {
-                    "type": "basic",
-                    "from": {
-                        "key_code": "spacebar"
-                    },
-                    "to": [
-                        {
-                            "key_code": "backslash",
-                            "modifiers": [
-                                "left_shift"
-                            ]
-                        },
-                        {
-                            "key_code": "spacebar",
-                            "repeat": false
-                        }
-                    ],
-                    "conditions": [
-                        {
-                            "type": "frontmost_application_if",
-                            "bundle_identifiers": [
-                                "^com\\.apple\\.Terminal$",
-                                "^com\\.github\\.wez\\.wezterm$"
-                            ]
-                        },
-                        {
-                            "type": "variable_if",
-                            "name": "sh_spacebar_pressed",
-                            "value": true
-                        }
-                    ]
-                },
-                {
-                    "type": "basic",
-                    "from": {
-                        "key_code": "spacebar"
-                    },
-                    "to": [
-                        {
-                            "set_variable": {
-                                "name": "sh_spacebar_pressed",
-                                "value": true
-                            }
-                        },
-                        {
-                            "key_code": "spacebar"
-                        }
-                    ],
-                    "to_delayed_action": {
-                        "to_if_invoked": [
-                            {
-                                "set_variable": {
-                                    "name": "sh_spacebar_pressed",
-                                    "value": false
-                                }
-                            }
-                        ],
-                        "to_if_canceled": [
-                            {
-                                "set_variable": {
-                                    "name": "sh_spacebar_pressed",
-                                    "value": false
-                                }
-                            }
-                        ]
-                    },
-                    "conditions": [
-                        {
-                            "type": "frontmost_application_if",
-                            "bundle_identifiers": [
-                                "^com\\.apple\\.Terminal$",
-                                "^com\\.github\\.wez\\.wezterm$"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "description": "Use double-shift to open Raycast, except in IntelliJ IDEA and the like.",
-            "manipulators": [
-                {
-                    "type": "basic",
-                    "from": {
-                        "key_code": "left_shift"
-                    },
-                    "to": [
-                        {
-                            "shell_command": "open -a 'Raycast.app'"
-                        }
-                    ],
-                    "conditions": [
-                        {
-                            "type": "frontmost_application_unless",
-                            "bundle_identifiers": [
-                                "^com\\.jetbrains\\.[a-zA-Z]+",
-                                "^com\\.raycast\\.macos$"
-                            ]
-                        },
-                        {
-                            "type": "variable_if",
-                            "name": "rh_left_shift_pressed",
-                            "value": true
-                        }
-                    ]
-                },
-                {
-                    "type": "basic",
-                    "from": {
-                        "key_code": "left_shift"
-                    },
-                    "to": [
-                        {
-                            "set_variable": {
-                                "name": "rh_left_shift_pressed",
-                                "value": true
-                            }
-                        },
-                        {
-                            "key_code": "left_shift"
-                        }
-                    ],
-                    "to_delayed_action": {
-                        "to_if_invoked": [
-                            {
-                                "set_variable": {
-                                    "name": "rh_left_shift_pressed",
-                                    "value": false
-                                }
-                            }
-                        ],
-                        "to_if_canceled": [
-                            {
-                                "set_variable": {
-                                    "name": "rh_left_shift_pressed",
-                                    "value": false
-                                }
-                            }
-                        ]
-                    },
-                    "conditions": [
-                        {
-                            "type": "frontmost_application_unless",
-                            "bundle_identifiers": [
-                                "^com\\.jetbrains\\.[a-zA-Z]+",
-                                "^com\\.raycast\\.macos$"
-                            ]
-                        }
-                    ]
-                }
-            ]
-        },
         {
             "description": "Launch or switch to apps by right cmd + letters.",
             "manipulators": [
@@ -308,6 +153,190 @@
                     "to": [
                         {
                             "shell_command": "open -a 'Numbers.app'"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Switch services on or off.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "y",
+                        "modifiers": {
+                            "mandatory": [
+                                "right_option"
+                            ],
+                            "optional": [
+                                "caps_lock"
+                            ]
+                        }
+                    },
+                    "to": [
+                        {
+                            # [ is_macos_arm64 start ]
+                            "shell_command": "/opt/homebrew/bin/yabai -m query --windows >/dev/null 2>&1 && /opt/homebrew/bin/yabai --stop-service || /opt/homebrew/bin/yabai --start-service"
+                            # [ is_macos_arm64 end ]
+                            # [ ! is_macos_arm64 start ]
+                            "shell_command": "yabai -m query --windows >/dev/null 2>&1 && yabai --stop-service || yabai --start-service"
+                            # [ ! is_macos_arm64 end ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Use double-shift to open Raycast.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "left_shift"
+                    },
+                    "to": [
+                        {
+                            "shell_command": "open -a 'Raycast.app'"
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_unless",
+                            "bundle_identifiers": [
+                                "^com\\.jetbrains\\.[a-zA-Z]+",
+                                "^com\\.raycast\\.macos$"
+                            ]
+                        },
+                        {
+                            "type": "variable_if",
+                            "name": "rh_left_shift_pressed",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "left_shift"
+                    },
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "rh_left_shift_pressed",
+                                "value": true
+                            }
+                        },
+                        {
+                            "key_code": "left_shift"
+                        }
+                    ],
+                    "to_delayed_action": {
+                        "to_if_invoked": [
+                            {
+                                "set_variable": {
+                                    "name": "rh_left_shift_pressed",
+                                    "value": false
+                                }
+                            }
+                        ],
+                        "to_if_canceled": [
+                            {
+                                "set_variable": {
+                                    "name": "rh_left_shift_pressed",
+                                    "value": false
+                                }
+                            }
+                        ]
+                    },
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_unless",
+                            "bundle_identifiers": [
+                                "^com\\.jetbrains\\.[a-zA-Z]+",
+                                "^com\\.raycast\\.macos$"
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "description": "Convert double-space to \" | \" in terminals.",
+            "manipulators": [
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar"
+                    },
+                    "to": [
+                        {
+                            "key_code": "backslash",
+                            "modifiers": [
+                                "left_shift"
+                            ]
+                        },
+                        {
+                            "key_code": "spacebar",
+                            "repeat": false
+                        }
+                    ],
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$"
+                            ]
+                        },
+                        {
+                            "type": "variable_if",
+                            "name": "sh_spacebar_pressed",
+                            "value": true
+                        }
+                    ]
+                },
+                {
+                    "type": "basic",
+                    "from": {
+                        "key_code": "spacebar"
+                    },
+                    "to": [
+                        {
+                            "set_variable": {
+                                "name": "sh_spacebar_pressed",
+                                "value": true
+                            }
+                        },
+                        {
+                            "key_code": "spacebar"
+                        }
+                    ],
+                    "to_delayed_action": {
+                        "to_if_invoked": [
+                            {
+                                "set_variable": {
+                                    "name": "sh_spacebar_pressed",
+                                    "value": false
+                                }
+                            }
+                        ],
+                        "to_if_canceled": [
+                            {
+                                "set_variable": {
+                                    "name": "sh_spacebar_pressed",
+                                    "value": false
+                                }
+                            }
+                        ]
+                    },
+                    "conditions": [
+                        {
+                            "type": "frontmost_application_if",
+                            "bundle_identifiers": [
+                                "^com\\.apple\\.Terminal$",
+                                "^com\\.github\\.wez\\.wezterm$"
+                            ]
                         }
                     ]
                 }

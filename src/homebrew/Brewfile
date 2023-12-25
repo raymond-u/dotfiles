@@ -38,6 +38,9 @@ brew "task"
 brew "tealdeer"
 brew "thefuck"
 
+# Services
+brew "koekeishiya/formulae/yabai"
+
 # Media viewers
 brew "chafa"
 

@@ -1,0 +1,4 @@
+yabai -m config layout bsp
+yabai -m config mouse_modifier alt
+yabai -m config focus_follows_mouse autofocus
+yabai -m rule --add app='^(Finder|Music|System Settings)$' manage=off
