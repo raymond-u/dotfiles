@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.9.1'
+version='0.9.2'
 
 # Scripts
 crypto=src/crypto.sh
@@ -949,7 +949,7 @@ main() {
             log_section 'Conda Configuration'
 
             # Prompt for installation of Conda
-            prompt_for_yesno 'Do you want to install Mambaforge (Conda), and make separate environments for R and Snakemake?' 'y' _yesno
+            prompt_for_yesno 'Do you want to install Miniforge (Conda), and make separate environments for R and Snakemake?' 'y' _yesno
             if is_true _yesno; then
                 # Use mirror for Conda
                 if is_true use_mirror; then
@@ -972,14 +972,14 @@ EOF
                 # Install Conda
                 log_info 'Installing Conda...'
                 if ! is_dry_run; then
-                    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-Linux-${architecture}.sh" >"${tmpdir}/mambaforge.sh"
-                    bash "${tmpdir}/mambaforge.sh" -b -p "${HOME}/opt/mambaforge"
+                    curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-${architecture}.sh" >"${tmpdir}/miniforge.sh"
+                    bash "${tmpdir}/miniforge.sh" -b -p "${HOME}/opt/miniforge"
 
                     # Activate Conda
                     if [[ -n "${BASH}" ]]; then
-                        eval "$("${HOME}/opt/mambaforge/bin/conda" shell.bash hook)"
+                        eval "$("${HOME}/opt/miniforge/bin/conda" shell.bash hook)"
                     else
-                        eval "$("${HOME}/opt/mambaforge/bin/conda" shell.zsh hook)"
+                        eval "$("${HOME}/opt/miniforge/bin/conda" shell.zsh hook)"
                     fi
                 fi
 
