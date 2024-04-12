@@ -406,9 +406,6 @@ fi
 # Initialize direnv
 eval "$(direnv hook zsh)"
 
-# Initialize the fuck
-eval "$(thefuck --alias fk)"
-
 # Initialize zoxide
 eval "$(zoxide init zsh)"
 alias cd='z'

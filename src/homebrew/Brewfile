@@ -36,7 +36,6 @@ brew "pandoc"
 brew "rename"
 brew "task"
 brew "tealdeer"
-brew "thefuck"
 
 # Services
 brew "koekeishiya/formulae/yabai"

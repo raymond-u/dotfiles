@@ -17,7 +17,7 @@ in with pkgs;
     inherit bottom duf htop ncdu neofetch procs;
 
     # General utilities
-    inherit age direnv hyperfine p7zip pandoc rename taskwarrior tealdeer thefuck unrar;
+    inherit age direnv hyperfine p7zip pandoc rename taskwarrior tealdeer unrar;
 
     # Media viewers
     inherit chafa;
