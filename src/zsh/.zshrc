@@ -221,7 +221,7 @@ alias reload='echo; exec sudo -i -u "${USER}" bash -c "cd \"${PWD}\"; exec \"${S
 alias reload='echo; exec "${SHELL}" -l'
 # [ ! can_sudo end ]
 # [ is_macos start ]
-alias hosts='nvim /private/etc/hosts'
+alias hosts='sudo nvim /private/etc/hosts'
 alias fix='sudo xattr -d com.apple.quarantine'
 alias fixx='sudo xattr -c'
 alias flushdns='sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder'
