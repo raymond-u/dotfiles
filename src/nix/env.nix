@@ -14,10 +14,10 @@ in with pkgs;
     inherit bat eza fd fzf hexyl ripgrep sd tree zoxide;
 
     # System utilities
-    inherit bottom duf fastfetch htop ncdu procs;
+    inherit bottom cpufetch duf fastfetch htop ncdu procs;
 
     # General utilities
-    inherit age direnv hyperfine p7zip pandoc rename taskwarrior tealdeer unrar;
+    inherit age direnv hyperfine onefetch p7zip pandoc rename taskwarrior tealdeer unrar;
 
     # Media viewers
     inherit chafa;
