@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.9.3'
+version='0.9.4'
 
 # Scripts
 crypto=src/crypto.sh
@@ -26,6 +26,7 @@ bottom=src/bottom/bottom.toml
 brewfile=src/homebrew/Brewfile
 clash_archive=src/clash/archive.age
 direnvrc=src/direnv/direnvrc
+fastfetch=src/fastfetch/config.jsonc
 gitconfig=src/git/config
 gitignore=src/git/ignore
 htoprc=src/htop/htoprc
@@ -75,9 +76,9 @@ brew_pkgs=(
     '# System Utilities'
     '  bottom'
     '  duf'
+    '  fastfetch'
     '  htop'
     '  ncdu'
-    '  neofetch'
     '  procs'
     ''
     '# General Utilities'
@@ -178,9 +179,9 @@ nix_pkgs=(
     '# System Utilities'
     '  bottom'
     '  duf'
+    '  fastfetch'
     '  htop'
     '  ncdu'
-    '  neofetch'
     '  procs'
     ''
     '# General Utilities'
@@ -1039,6 +1040,7 @@ EOF
         put_file 'Aria2' "${aria2}" "${HOME}/.config/aria2/aria2.conf"
         put_file 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
         put_file 'direnv' "${direnvrc}" "${HOME}/.config/direnv/direnvrc"
+        put_file 'fastfetch' "${fastfetch}" "${HOME}/.config/fastfetch/config.jsonc"
         put_file 'Git' "${gitconfig}" "${HOME}/.config/git/config"
         put_file 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
         put_file 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"
@@ -1257,6 +1259,7 @@ EOF
         put_file 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
         put_encrypted_file 'Clash' "${clash_archive}" "${HOME}/.config" "${HOME}/.config/clash"
         put_file 'direnv' "${direnvrc}" "${HOME}/.config/direnv/direnvrc"
+        put_file 'fastfetch' "${fastfetch}" "${HOME}/.config/fastfetch/config.jsonc"
         put_file 'Git' "${gitconfig}" "${HOME}/.config/git/config"
         put_file 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
         put_file 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"

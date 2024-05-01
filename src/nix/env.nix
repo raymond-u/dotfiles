@@ -14,7 +14,7 @@ in with pkgs;
     inherit bat eza fd fzf hexyl ripgrep sd tree zoxide;
 
     # System utilities
-    inherit bottom duf htop ncdu neofetch procs;
+    inherit bottom duf fastfetch htop ncdu procs;
 
     # General utilities
     inherit age direnv hyperfine p7zip pandoc rename taskwarrior tealdeer unrar;

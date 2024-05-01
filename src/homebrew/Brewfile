@@ -24,9 +24,9 @@ brew "zoxide"
 # System utilities
 brew "bottom"
 brew "duf"
+brew "fastfetch"
 brew "htop"
 brew "ncdu"
-brew "neofetch"
 brew "procs"
 
 # General utilities
