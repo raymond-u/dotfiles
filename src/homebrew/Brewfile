@@ -94,6 +94,7 @@ cask "wezterm"
 
 # Utilities
 cask "aldente"
+cask "basictex"
 cask "keka"
 cask "shottr"
 cask "xnconvert"
