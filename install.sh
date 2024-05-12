@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.9.5'
+version='0.9.6'
 
 # Scripts
 crypto=src/crypto.sh
@@ -36,7 +36,7 @@ mpv_conf=src/mpv/mpv.conf
 mpv_input=src/mpv/input.conf
 mpv_shaders=src/mpv/shaders
 nix_env=src/nix/env.nix
-nvchad=src/nvchad/custom
+nvchad=src/nvchad
 p10k=src/powerlevel10k/p10k.zsh
 passage_archive=src/passage/archive.age
 ssh_archive=src/ssh/archive.age
@@ -930,24 +930,10 @@ main() {
 
         # Configure Neovim
         if ! is_true update; then
-            log_section 'Neovim Configuration'
-            _yesno=true
+            log_section 'Clean up folders for Neovim.'
 
-            # Check if config files already exist
-            if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_for_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
-            fi
-
-            # Install NvChad
-            if is_true _yesno; then
-                log_info 'Installing NvChad...'
-                if ! is_dry_run; then
-                    rm -rf "${HOME}/.cache/nvim" "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
-                    git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
-                fi
-                reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
-            fi
-            unset _yesno
+            is_dry_run || rm -rf "${HOME}/.local/share/nvim"
+            reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
         fi
 
         # Configure Conda
@@ -1050,7 +1036,7 @@ EOF
         put_file 'Git' "${gitignore}" "${HOME}/.config/git/ignore"
         put_file 'htop' "${htoprc}" "${HOME}/.config/htop/htoprc"
         put_file 'login' "${hushlogin}" "${HOME}/.hushlogin"
-        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim/lua/custom"
+        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim"
         put_file 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
         put_file 'Taskwarrior' "${taskrc}" "${HOME}/.config/task/taskrc"
         put_file 'Wget' "${wgetrc}" "${HOME}/.config/wget/wgetrc"
@@ -1199,24 +1185,10 @@ EOF
 
         # Configure Neovim
         if ! is_true update; then
-            log_section 'Neovim Configuration'
-            _yesno=true
+            log_section 'Clean up folders for Neovim.'
 
-            # Check if config files already exist
-            if [[ -n "$(ls -A "${HOME}/.config/nvim" 2>/dev/null)" ]]; then
-                prompt_for_yesno 'Neovim config files already exist. Do you want to remove them and install NvChad?' 'n' _yesno
-            fi
-
-            # Install NvChad
-            if is_true _yesno; then
-                log_info 'Installing NvChad...'
-                if ! is_dry_run; then
-                    rm -rf "${HOME}/.cache/nvim" "${HOME}/.config/nvim" "${HOME}/.local/share/nvim"
-                    git clone --depth=1 --quiet https://github.com/NvChad/NvChad "${HOME}/.config/nvim"
-                fi
-                reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
-            fi
-            unset _yesno
+            is_dry_run || rm -rf "${HOME}/.local/share/nvim"
+            reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
         fi
 
         # Configure Node.js
@@ -1273,7 +1245,7 @@ EOF
         put_file 'mpv' "${mpv_conf}" "${HOME}/.config/mpv/mpv.conf"
         put_file 'mpv' "${mpv_input}" "${HOME}/.config/mpv/input.conf"
         put_folder 'mpv' "${mpv_shaders}" "${HOME}/.config/mpv/shaders"
-        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim/lua/custom"
+        put_folder 'Neovim' "${nvchad}" "${HOME}/.config/nvim"
         put_encrypted_file 'passage' "${passage_archive}" "${HOME}/.passage" "${HOME}/.passage/store"
         put_file 'Powerlevel10k' "${p10k}" "${HOME}/.config/powerlevel10k/p10k.zsh"
         put_encrypted_file 'SSH' "${ssh_archive}" "${HOME}" "${HOME}/.ssh"
