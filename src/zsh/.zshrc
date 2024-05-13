@@ -199,7 +199,7 @@ alias conac='conda activate'
 alias conde='conda deactivate'
 alias conls='mamba env list'
 alias concr='mamba create -n'
-alias conre='mamba remove --all -n'
+alias conrm='mamba remove --all -n'
 alias conin='mamba install'
 alias conun='mamba remove'
 # [ is_linux end ]
