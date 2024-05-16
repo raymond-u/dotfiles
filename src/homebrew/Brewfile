@@ -68,7 +68,6 @@ brew "r"
 brew "rust"
 
 # Fonts
-tap "homebrew/cask-fonts"
 cask "font-sarasa-gothic"
 
 # [ install_cask start ]
