@@ -546,6 +546,12 @@ clean_up() {
 #################################
 
 main() {
+    # Check Bash version
+    if (( ${BASH_VERSINFO:-0} < 4 )); then
+        log_error 'Error: Bash 4 or later is required.'
+        exit 1
+    fi
+
     # Parse arguments
     while (( $# > 0 )); do
         case "$1" in
