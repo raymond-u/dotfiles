@@ -293,8 +293,8 @@ print_help() {
     echo '  -u, --update            Update the home environment. Intended for internal use only.'
     echo '  -n, --dry-run           Print info, but do not change anything.'
     echo '  --is-linux              Force the script to identify the OS as Linux.'
-    echo '  --is-macos              Force the script to identify the OS as macOS.'
-    echo '  --is-macos-arm64        Force the script to identify the OS as macOS arm64.'
+    echo '  --is-macos              Force the script to identify the OS as macOS (x86_64).'
+    echo '  --is-macos-arm64        Force the script to identify the OS as macOS (arm64).'
     echo '  --can-sudo              Use sudo when necessary.'
     echo '  --has-identity          Use an identity file to decrypt secrets.'
     echo '  --identity-file         Specify the identity file.'
@@ -341,9 +341,9 @@ EOF
     if is_true is_linux; then
         echo 'Linux environment detected. Nix will be used as the package manager.'
     elif is_true is_macos_arm64; then
-        echo 'macOS arm64 environment detected. Homebrew will be used as the package manager.'
+        echo 'macOS (arm64) environment detected. Homebrew will be used as the package manager.'
     elif is_true is_macos; then
-        echo 'macOS environment detected. Homebrew will be used as the package manager.'
+        echo 'macOS (x86_64) environment detected. Homebrew will be used as the package manager.'
     fi
 
     echo "Get ready for a comprehensive shell setup, installation of common packages, and ready-to-use development environment.${no_color}"
