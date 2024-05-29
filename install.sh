@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.9.6'
+version='0.9.7'
 
 # Scripts
 crypto=src/crypto.sh
@@ -796,7 +796,7 @@ main() {
                         unset _yesno
                         # TODO: support PRoot
                         log_info 'Installing Nix in non-root mode using proot...'
-                        curl -L "https://github.com/proot-me/proot/releases/download/v5.3.0/proot-v5.3.0-${architecture}-static" >"${tmpdir}/proot"
+                        curl -L "https://github.com/proot-me/proot/releases/download/v5.4.0/proot-v5.4.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
                         log_info 'A shell will be spawned by PRoot. Please enter "sh <(curl -L https://nixos.org/nix/install)" in the new shell to install Nix.'
                         log_info "After Nix installation is finished, please continue to enter \"nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'\" to set up the home environment."
