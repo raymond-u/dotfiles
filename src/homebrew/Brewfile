@@ -52,6 +52,7 @@ brew "neovim"
 
 # Web
 brew "aria2"
+brew "oha"
 brew "openssh"
 brew "qrcp"
 brew "wget"
