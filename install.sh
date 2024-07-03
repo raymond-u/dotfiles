@@ -439,6 +439,7 @@ run_with_nix_wrapper() {
                 bwrap --ro-bind  /etc           /etc   \
                       --ro-bind  /usr           /usr   \
                       --bind     /home          /home  \
+                      --bind     /opt           /opt   \
                       --bind     /run           /run   \
                       --bind     /sys           /sys   \
                       --bind     /tmp           /tmp   \
