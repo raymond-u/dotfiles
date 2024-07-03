@@ -435,10 +435,7 @@ get_package_list() {
 
 run_with_nix_wrapper() {
     if ! is_dry_run; then
-        if [[ -n "$(command -v "${1%% *}")" ]]; then
-            eval "$1"
-        else
-            if is_true use_bwrap; then
+        if is_true use_bwrap; then
                 bwrap --ro-bind  /etc           /etc   \
                       --ro-bind  /usr           /usr   \
                       --bind     /home          /home  \
@@ -454,12 +451,13 @@ run_with_nix_wrapper() {
                       --proc     /proc                 \
                       --bind     "${HOME}/.nix" /nix   \
                       bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
-            elif is_true use_chroot; then
-                "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
-            elif is_true use_proot; then
-                # TODO: support PRoot
-                :
-            fi
+        elif is_true use_chroot; then
+            "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
+        elif is_true use_proot; then
+            # TODO: support PRoot
+            :
+        elif [[ -n "$(command -v "${1%% *}")" ]]; then
+            eval "$1"
         fi
     fi
 }
