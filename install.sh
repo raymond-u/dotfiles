@@ -792,19 +792,19 @@ main() {
                 prompt_for_continue "Nix will be installed in ${_nix_installation} mode."
                 # Add shared Nix configuration
                 if is_true can_sudo; then
-                    is_dry_run || sudo bash -c 'mkdir -p /etc/nix; cat >>/etc/nix/nix.conf <<"EOF"
+                    is_dry_run || sudo bash -c "mkdir -p /etc/nix; cat >>/etc/nix/nix.conf <<'EOF'
 always-allow-substitutes = true
 auto-optimise-store = true
 experimental-features = flakes nix-command
 max-jobs = auto
-EOF'
+EOF"
                 elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
-                    is_dry_run || run_with_nix_wrapper 'mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<"EOF"
+                    run_with_nix_wrapper "mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<'EOF'
 always-allow-substitutes = true
 auto-optimise-store = true
 experimental-features = flakes nix-command
 max-jobs = auto
-EOF'
+EOF"
                 else
                     mkdir -p "${HOME}/.config/nix"
                     cat >>"${HOME}/.config/nix/nix.conf" <<'EOF'
@@ -832,10 +832,8 @@ EOF
                         ;;
                     bubblewrap)
                         log_info 'Installing Nix in single-user mode using bubblewrap...'
-                        if ! is_dry_run; then
-                            mkdir -p "${HOME}/.nix"
-                            run_with_nix_wrapper 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
-                        fi
+                        is_dry_run || mkdir -p "${HOME}/.nix"
+                        run_with_nix_wrapper 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by bubblewrap.')
                         reminders+=('Nix: this shell has restricted access to the host file system. You can add additional bindings if needed.')
                         ;;
@@ -846,8 +844,7 @@ EOF
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
                             mv "${tmpdir}/nix-user-chroot" "${HOME}/bin"
-                            run_with_nix_wrapper 'echo "sandbox = false" >>/nix/etc/nix/nix.conf'
-                            run_with_nix_wrapper 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
+                            run_with_nix_wrapper "echo 'sandbox = false' >>/nix/etc/nix/nix.conf; sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes"
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by nix-user-chroot.')
                         ;;
@@ -886,7 +883,7 @@ EOF
                         is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
                     elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
                         log_info 'Add USTC mirror as a trusted substituter.'
-                        is_dry_run || run_with_nix_wrapper 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
+                        run_with_nix_wrapper "mkdir -p /nix/etc/nix; echo 'trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store' >>/nix/etc/nix/nix.conf"
                     else
                         log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
                         log_error 'Abort setting mirror for Nix.'
