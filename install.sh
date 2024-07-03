@@ -806,13 +806,15 @@ experimental-features = flakes nix-command
 max-jobs = auto
 EOF"
                 else
-                    mkdir -p "${HOME}/.config/nix"
-                    cat >>"${HOME}/.config/nix/nix.conf" <<'EOF'
+                    if ! is_dry_run; then
+                        mkdir -p "${HOME}/.config/nix"
+                        cat >>"${HOME}/.config/nix/nix.conf" <<'EOF'
 always-allow-substitutes = true
 auto-optimise-store = true
 experimental-features = flakes nix-command
 max-jobs = auto
 EOF
+                    fi
                 fi
                 reminders+=( 'Nix: if you are using Nix on an NFS file system, please add "use-sqlite-wal = false" to the Nix configuration.')
                 case "${_nix_installation}" in
