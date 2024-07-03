@@ -433,7 +433,7 @@ get_package_list() {
     fi
 }
 
-run_with_nix() {
+run_with_nix_wrapper() {
     if ! is_dry_run; then
         if [[ -n "$(command -v "${1%% *}")" ]]; then
             eval "$1"
@@ -799,7 +799,7 @@ experimental-features = flakes nix-command
 max-jobs = auto
 EOF'
                 elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
-                    is_dry_run || run_with_nix 'mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<"EOF"
+                    is_dry_run || run_with_nix_wrapper 'mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<"EOF"
 always-allow-substitutes = true
 auto-optimise-store = true
 experimental-features = flakes nix-command
@@ -834,7 +834,7 @@ EOF
                         log_info 'Installing Nix in single-user mode using bubblewrap...'
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
-                            run_with_nix 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
+                            run_with_nix_wrapper 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by bubblewrap.')
                         reminders+=('Nix: this shell has restricted access to the host file system. You can add additional bindings if needed.')
@@ -846,8 +846,8 @@ EOF
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
                             mv "${tmpdir}/nix-user-chroot" "${HOME}/bin"
-                            run_with_nix 'echo "sandbox = false" >>/nix/etc/nix/nix.conf'
-                            run_with_nix 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
+                            run_with_nix_wrapper 'echo "sandbox = false" >>/nix/etc/nix/nix.conf'
+                            run_with_nix_wrapper 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by nix-user-chroot.')
                         ;;
@@ -886,7 +886,7 @@ EOF
                         is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
                     elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
                         log_info 'Add USTC mirror as a trusted substituter.'
-                        is_dry_run || run_with_nix 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
+                        is_dry_run || run_with_nix_wrapper 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
                     else
                         log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
                         log_error 'Abort setting mirror for Nix.'
@@ -898,19 +898,19 @@ EOF
                     if ! is_dry_run; then
                         mkdir -p "${HOME}/.config/nix"
                         echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                        run_with_nix 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
+                        run_with_nix_wrapper 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
                         if is_true can_sudo; then
                             sudo systemctl restart nix-daemon
                         fi
                     fi
                 else
                     # Add default channel
-                    run_with_nix 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
+                    run_with_nix_wrapper 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
                 fi
                 unset _can_use_mirror
             else
                 # Add default channel
-                run_with_nix 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
+                run_with_nix_wrapper 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
             fi
         fi
 
@@ -928,7 +928,7 @@ EOF
             fi
 
             # Might already have nix in PATH when updating
-            run_with_nix "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
+            run_with_nix_wrapper "nix-channel --update; nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'"
         fi
 
         # Configure Zsh
@@ -976,16 +976,16 @@ EOF
         # Install with pipx
         if is_true update; then
             log_info 'Updating packages with pipx...'
-            run_with_nix 'pipx upgrade-all'
+            run_with_nix_wrapper 'pipx upgrade-all'
         else
             log_info 'Installing packages with pipx...'
             log_info 'Installing Poetry...'
-            run_with_nix 'pipx install poetry'
+            run_with_nix_wrapper 'pipx install poetry'
         fi
 
         # Configure tealdeer
         log_info 'Fetch caches for tealdeer.'
-        run_with_nix 'tldr --update'
+        run_with_nix_wrapper 'tldr --update'
 
         # Configure Neovim
         if ! is_true update; then
@@ -1055,7 +1055,7 @@ EOF
 
             # Enable corepack
             log_info 'Enable corepack.'
-            run_with_nix 'corepack enable'
+            run_with_nix_wrapper 'corepack enable'
         fi
 
         # Configure Rust
