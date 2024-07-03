@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.9.7'
+version='0.10.0'
 
 # Scripts
 crypto=src/crypto.sh
@@ -254,6 +254,8 @@ can_sudo=false
 has_identity=false
 install_cask=false
 use_mirror=false
+use_single=false
+use_bwrap=false
 use_chroot=false
 use_proot=false
 
@@ -265,6 +267,8 @@ config_flags=(
     'has_identity'
     'install_cask'
     'use_mirror'
+    'use_single'
+    'use_bwrap'
     'use_chroot'
     'use_proot'
 )
@@ -432,8 +436,24 @@ run_with_nix() {
         if [[ -n "$(command -v "${1%% *}")" ]]; then
             eval "$1"
         else
-            if is_true use_chroot; then
-                "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc "$1"
+            if is_true use_bwrap; then
+                bwrap --ro-bind  /etc           /etc   \
+                      --ro-bind  /usr           /usr   \
+                      --bind     /home          /home  \
+                      --bind     /run           /run   \
+                      --bind     /sys           /sys   \
+                      --bind     /tmp           /tmp   \
+                      --bind     /var           /var   \
+                      --symlink  /usr/bin       /bin   \
+                      --symlink  /usr/lib       /lib   \
+                      --symlink  /usr/lib64     /lib64 \
+                      --symlink  /usr/sbin      /sbin  \
+                      --dev-bind /dev           /dev   \
+                      --proc     /proc                 \
+                      --bind     "${HOME}/.nix" /nix   \
+                      bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
+            elif is_true use_chroot; then
+                "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
             elif is_true use_proot; then
                 # TODO: support PRoot
                 :
@@ -483,7 +503,7 @@ put_file() {
 }
 
 put_file_if_not_exists() {
-    if ! [[ -e "$3" ]]; then
+    if [[ ! -e "$3" ]]; then
         log_info "Put $1 config file to $3."
 
         if ! is_dry_run; then
@@ -747,45 +767,87 @@ main() {
                         # Sudo might not be needed since Nix has been installed once and its build users may still linger
                         if selinuxenabled 2>/dev/null; then
                             _nix_installation='single-user'
+                            use_single=true
                         else
                             _nix_installation='multi-user'
                         fi
                     else
-                        # Check if OS supports user namespaces for unprivileged users
+                        # Bubblewrap does not require user namespace support if it is installed as a setuid binary
                         if [[ "$(unshare --user --pid echo 'YES' 2>/dev/null)" == 'YES' ]]; then
-                            _nix_installation='nix-user-chroot'
+                            if [[ -n "$(command -v bwrap)" ]]; then
+                                _nix_installation='bubblewrap'
+                                use_bwrap=true
+                            else
+                                _nix_installation='nix-user-chroot'
+                                use_chroot=true
+                            fi
                         else
                             _nix_installation='proot'
+                            use_proot=true
                         fi
                     fi
                 fi
+                prompt_for_continue "Nix will be installed in ${_nix_installation} mode."
+                # Add shared Nix configuration
+                if is_true can_sudo; then
+                    is_dry_run || sudo bash -c 'mkdir -p /etc/nix; cat >>/etc/nix/nix.conf <<"EOF"
+always-allow-substitutes = true
+auto-optimise-store = true
+experimental-features = flakes nix-command
+max-jobs = auto
+EOF'
+                elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
+                    is_dry_run || run_with_nix 'mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<"EOF"
+always-allow-substitutes = true
+auto-optimise-store = true
+experimental-features = flakes nix-command
+max-jobs = auto
+EOF'
+                else
+                    mkdir -p "${HOME}/.config/nix"
+                    cat >>"${HOME}/.config/nix/nix.conf" <<'EOF'
+always-allow-substitutes = true
+auto-optimise-store = true
+experimental-features = flakes nix-command
+max-jobs = auto
+EOF
+                fi
+                reminders+=( 'Nix: if you are using Nix on an NFS file system, please add "use-sqlite-wal = false" to the Nix configuration.')
                 case "${_nix_installation}" in
                     multi-user)
                         log_info 'Installing Nix in multi-user mode...'
                         if ! is_dry_run; then
-                            sh <(curl -L https://nixos.org/nix/install) --daemon
-                            source /etc/profile.d/nix.sh
+                            sh <(curl -fsSL https://nixos.org/nix/install) --daemon --no-channel-add --no-modify-profile --yes
+                            source /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
                         fi
                         ;;
                     single-user)
                         log_info 'Installing Nix in single-user mode...'
                         if ! is_dry_run; then
-                            sh <(curl -L https://nixos.org/nix/install) --no-daemon
-                            source /etc/profile.d/nix.sh
+                            sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes
+                            source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
                         fi
                         ;;
+                    bubblewrap)
+                        log_info 'Installing Nix in single-user mode using bubblewrap...'
+                        if ! is_dry_run; then
+                            mkdir -p "${HOME}/.nix"
+                            run_with_nix 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
+                        fi
+                        reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by bubblewrap.')
+                        reminders+=('Nix: this shell has restricted access to the host file system. You can add additional bindings if needed.')
+                        ;;
                     nix-user-chroot)
-                        log_info 'Installing Nix in non-root mode using nix-user-chroot...'
+                        log_info 'Installing Nix in single-user mode using nix-user-chroot...'
                         curl -L "https://github.com/nix-community/nix-user-chroot/releases/download/1.2.2/nix-user-chroot-bin-1.2.2-${architecture}-unknown-linux-musl" >"${tmpdir}/nix-user-chroot"
                         chmod +x "${tmpdir}/nix-user-chroot"
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
-                            "${tmpdir}/nix-user-chroot" "${HOME}/.nix" bash -c 'sh <(curl -L https://nixos.org/nix/install)'
                             mv "${tmpdir}/nix-user-chroot" "${HOME}/bin"
+                            run_with_nix 'echo "sandbox = false" >>/nix/etc/nix/nix.conf'
+                            run_with_nix 'sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes'
                         fi
-                        use_chroot=true
-                        reminders+=("nix-user-chroot: the binary has been installed to ${HOME}/bin.")
-                        reminders+=('nix-user-chroot: note that you can only use Nix and the installed packages within the shell started by "nix-user-chroot ~/.nix bash".')
+                        reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by nix-user-chroot.')
                         ;;
                     proot)
                         prompt_for_yesno "Nix must be installed using PRoot, but support for PRoot is not complete and haven't been tested. Do you still want to continue?" 'n' _yesno
@@ -798,19 +860,16 @@ main() {
                         log_info 'Installing Nix in non-root mode using proot...'
                         curl -L "https://github.com/proot-me/proot/releases/download/v5.4.0/proot-v5.4.0-${architecture}-static" >"${tmpdir}/proot"
                         chmod +x "${tmpdir}/proot"
-                        log_info 'A shell will be spawned by PRoot. Please enter "sh <(curl -L https://nixos.org/nix/install)" in the new shell to install Nix.'
-                        log_info "After Nix installation is finished, please continue to enter \"nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'\" to set up the home environment."
-                        log_info "When done, please enter exit to get back."
+                        log_info 'A shell will be spawned by PRoot. Please enter "sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes" in the new shell to install Nix.'
+                        log_info "After Nix installation is finished, please add a channel and enter \"nix-env -i -f '${tmpdir}/dotfiles/${nix_env}'\" to set up the home environment."
+                        log_info "When done, please enter exit."
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
-                            mkdir -p "${HOME}/.config/nix"
                             echo 'sandbox = false' >>"${HOME}/.config/nix/nix.conf"
-                            "${tmpdir}/proot" -b "${HOME}/.nix:/nix"
                             mv "${tmpdir}/proot" "${HOME}/bin"
+                            "${HOME}/bin/proot" -b "${HOME}/.nix:/nix"
                         fi
-                        use_proot=true
-                        reminders+=("PRoot: the binary has been installed to ${HOME}/bin.")
-                        reminders+=('PRoot: note that you can only use Nix and the installed packages within the shell started by "proot -b ~/.nix:/nix".')
+                        reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by PRoot.')
                         ;;
                 esac
                 unset _nix_installation
@@ -819,22 +878,17 @@ main() {
             # Use mirror for Nix
             if is_true use_mirror; then
                 _can_use_mirror=true
-                if is_true use_chroot; then
-                    log_info 'Add USTC mirror as a trusted substituter.'
-                    is_dry_run || "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
-                elif is_true use_proot; then
-                    # TODO: support PRoot
-                    :
-                else
-                    if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
-                        if is_true can_sudo; then
-                            log_info 'Add USTC mirror as a trusted substituter.'
-                            is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
-                        else
-                            log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
-                            log_error 'Abort setting mirror for Nix.'
-                            _can_use_mirror=false
-                        fi
+                if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
+                    if is_true can_sudo; then
+                        log_info 'Add USTC mirror as a trusted substituter.'
+                        is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
+                    elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
+                        log_info 'Add USTC mirror as a trusted substituter.'
+                        is_dry_run || run_with_nix 'mkdir -p /nix/etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/nix/etc/nix/nix.conf'
+                    else
+                        log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
+                        log_error 'Abort setting mirror for Nix.'
+                        _can_use_mirror=false
                     fi
                 fi
                 if is_true _can_use_mirror; then
@@ -842,22 +896,19 @@ main() {
                     if ! is_dry_run; then
                         mkdir -p "${HOME}/.config/nix"
                         echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                        if is_true use_chroot; then
-                            "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -lc 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
-                        elif is_true use_proot; then
-                            # TODO: support PRoot
-                            :
-                        else
-                            nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs
-                            if is_true can_sudo; then
-                                # Remove redundant channels
-                                sudo -i nix-channel --remove nixpkgs
-                                sudo systemctl restart nix-daemon
-                            fi
+                        run_with_nix 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
+                        if is_true can_sudo; then
+                            sudo systemctl restart nix-daemon
                         fi
                     fi
+                else
+                    # Add default channel
+                    run_with_nix 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
                 fi
                 unset _can_use_mirror
+            else
+                # Add default channel
+                run_with_nix 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
             fi
         fi
 
@@ -915,9 +966,9 @@ main() {
             mkdir -p "${HOME}/.config/wezterm"
             curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
         fi
-        if is_true use_chroot; then
-            reminders+=('WezTerm: "WezTerm connect" won'\''t work if installed with nix-user-chroot.')
-            reminders+=("WezTerm: build WezTerm from source or use it in AppImage format.")
+        if is_true use_bwrap || is_true use_chroot || is_true use_proot; then
+            reminders+=('WezTerm: "WezTerm connect" won'\''t be able to find the server application.')
+            reminders+=("WezTerm: launch the server daemon or install WezTerm seperately.")
         fi
 
         # Install with pipx

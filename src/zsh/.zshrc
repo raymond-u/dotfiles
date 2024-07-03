@@ -1,7 +1,30 @@
+# [ use_bwrap start ]
+# Set up shell for nix
+if [[ -z "${_NIX_BWRAP}" ]]; then
+    _NIX_BWRAP=1 exec bwrap --ro-bind  /etc           /etc   \
+                            --ro-bind  /usr           /usr   \
+                            --bind     /home          /home  \
+                            --bind     /run           /run   \
+                            --bind     /sys           /sys   \
+                            --bind     /tmp           /tmp   \
+                            --bind     /var           /var   \
+                            --symlink  /usr/bin       /bin   \
+                            --symlink  /usr/lib       /lib   \
+                            --symlink  /usr/lib64     /lib64 \
+                            --symlink  /usr/sbin      /sbin  \
+                            --dev-bind /dev           /dev   \
+                            --proc     /proc                 \
+                            --bind     "${HOME}/.nix" /nix   \
+                            zsh -l
+    exit
+else
+    source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
+fi
+# [ use_bwrap end ]
 # [ use_chroot start ]
-# Mount nix if needed
-if [[ -z "${_NIX_USER_CHROOT_MOUNTED}" ]]; then
-    _NIX_USER_CHROOT_MOUNTED=1 "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" zsh -l
+# Set up shell for nix
+if [[ -z "${_NIX_USER_CHROOT}" ]]; then
+    _NIX_USER_CHROOT=1 exec "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" zsh -l
     exit
 else
     source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
