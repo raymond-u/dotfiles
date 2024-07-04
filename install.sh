@@ -987,7 +987,7 @@ EOF
 
         # Configure Neovim
         if ! is_true update; then
-            log_section 'Clean up folders for Neovim.'
+            log_info 'Clean up folders for Neovim.'
 
             is_dry_run || rm -rf "${HOME}/.local/share/nvim"
             reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
