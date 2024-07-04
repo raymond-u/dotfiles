@@ -998,7 +998,7 @@ EOF
             log_section 'Conda Configuration'
 
             # Prompt for installation of Conda
-            prompt_for_yesno 'Do you want to install Miniforge (Conda), and make separate environments for R and Snakemake?' 'y' _yesno
+            prompt_for_yesno 'Do you want to install Miniforge (Conda)?' 'y' _yesno
             if is_true _yesno; then
                 # Use mirror for Conda
                 if is_true use_mirror; then
@@ -1023,25 +1023,6 @@ EOF
                 if ! is_dry_run; then
                     curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-${architecture}.sh" >"${tmpdir}/miniforge.sh"
                     bash "${tmpdir}/miniforge.sh" -b -p "${HOME}/opt/miniforge"
-
-                    # Activate Conda
-                    if [[ -n "${BASH}" ]]; then
-                        eval "$("${HOME}/opt/miniforge/bin/conda" shell.bash hook)"
-                    else
-                        eval "$("${HOME}/opt/miniforge/bin/conda" shell.zsh hook)"
-                    fi
-                fi
-
-                # Install R
-                log_info 'Installing R...'
-                if ! is_dry_run; then
-                    mamba create -n r -c conda-forge -y r-essentials
-                fi
-
-                # Install Snakemake
-                log_info 'Installing Snakemake...'
-                if ! is_dry_run; then
-                    mamba create -n snakemake -c conda-forge -c bioconda -y snakemake
                 fi
             fi
             unset _yesno
