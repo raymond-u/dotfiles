@@ -1054,7 +1054,6 @@ EOF
                 if ! is_dry_run; then
                     curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
                     source "${HOME}/.cargo/env"
-                    rustup default stable
                 fi
 
                 # Install rust-script
