@@ -1034,7 +1034,7 @@ EOF
 
             # Enable corepack
             log_info 'Enable corepack.'
-            run_with_nix_wrapper 'corepack enable'
+            run_with_nix_wrapper "corepack enable --install-directory '${HOME}/bin'"
         fi
 
         # Configure Rust
