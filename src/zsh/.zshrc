@@ -159,16 +159,17 @@ export HISTFILE="${HOME}/.local/state/zsh/history"
 # [ is_linux start ]
 # Configure completions for Nix packages
 for profile in ''${(z)NIX_PROFILES}; do
-    fpath+=(
+    fpath=(
         "${profile}/share/zsh/site-functions"
         "${profile}/share/zsh/${ZSH_VERSION}/functions"
         "${profile}/share/zsh/vendor-completions"
+        ${fpath}
     )
 done
 # [ is_linux end ]
 # [ is_macos_arm64 start ]
 # Configure completions for Homebrew packages
-fpath+=("$(brew --prefix)/share/zsh/site-functions")
+fpath=("$(brew --prefix)/share/zsh/site-functions" ${fpath})
 # [ is_macos_arm64 end ]
 
 # Configure fzf
