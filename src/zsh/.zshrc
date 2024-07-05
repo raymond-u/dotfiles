@@ -4,6 +4,7 @@ if [[ -z "${_NIX_BWRAP}" ]]; then
     _NIX_BWRAP=1 exec bwrap --ro-bind  /etc           /etc   \
                             --ro-bind  /usr           /usr   \
                             --bind     /home          /home  \
+                            --bind     /opt           /opt   \
                             --bind     /run           /run   \
                             --bind     /sys           /sys   \
                             --bind     /tmp           /tmp   \
