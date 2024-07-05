@@ -940,7 +940,7 @@ EOF
             reminders+=('Zinit: you can run "zinit self-update" to compile Zinit (optional).')
 
             # Change the login shell to Zsh
-            if [[ ! "${SHELL}" =~ 'zsh'$ ]]; then
+            if [[ ! "${SHELL}" =~ 'zsh'$ ]] && ! is_true use_bwrap && ! is_true use_chroot && ! is_true use_proot; then
                 _can_use_zsh=true
                 if [[ ! "$(</etc/shells)" =~ "$(readlink -f "$(command -v zsh)")" ]]; then
                     if is_true can_sudo; then
@@ -968,7 +968,7 @@ EOF
         fi
         if is_true use_bwrap || is_true use_chroot || is_true use_proot; then
             reminders+=('WezTerm: "WezTerm connect" won'\''t be able to find the server application.')
-            reminders+=("WezTerm: launch the server daemon or install WezTerm seperately.")
+            reminders+=("WezTerm: you can launch the server daemon manually or install WezTerm seperately.")
         fi
 
         # Install with pipx
