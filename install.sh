@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.0'
+version='0.10.1'
 
 # Scripts
 crypto=src/crypto.sh
@@ -453,7 +453,7 @@ run_with_nix_wrapper() {
                       --bind     "${HOME}/.nix" /nix   \
                       bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
         elif is_true use_chroot; then
-            "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
+            "${HOME}/.local/bin/nix-user-chroot" "${HOME}/.nix" bash -c "[[ ! -e '${HOME}/.nix-profile/etc/profile.d/nix.sh' ]] || source '${HOME}/.nix-profile/etc/profile.d/nix.sh'; $1"
         elif is_true use_proot; then
             # TODO: support PRoot
             :
@@ -749,7 +749,7 @@ main() {
     if is_true is_linux; then
         # Create empty folders
         log_info 'Create empty folders in the home directory.'
-        is_dry_run || mkdir -p "${HOME}/"{bin,downloads,opt,playground,share/man} "${HOME}/.local/state/"{less,zsh}
+        is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt,share/man} "${HOME}/.local/state/"{less,zsh} "${HOME}/"{downloads,playground}
 
         # Configure Nix
         if ! is_true update; then
@@ -844,7 +844,7 @@ EOF
                         chmod +x "${tmpdir}/nix-user-chroot"
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
-                            mv "${tmpdir}/nix-user-chroot" "${HOME}/bin"
+                            mv "${tmpdir}/nix-user-chroot" "${HOME}/.local/bin"
                             run_with_nix_wrapper "echo 'sandbox = false' >>/nix/etc/nix/nix.conf; sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes"
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by nix-user-chroot.')
@@ -866,8 +866,8 @@ EOF
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
                             echo 'sandbox = false' >>"${HOME}/.config/nix/nix.conf"
-                            mv "${tmpdir}/proot" "${HOME}/bin"
-                            "${HOME}/bin/proot" -b "${HOME}/.nix:/nix"
+                            mv "${tmpdir}/proot" "${HOME}/.local/bin"
+                            "${HOME}/.local/bin/proot" -b "${HOME}/.nix:/nix"
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by PRoot.')
                         ;;
@@ -1022,7 +1022,7 @@ EOF
                 log_info 'Installing Conda...'
                 if ! is_dry_run; then
                     curl -fsSL "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-${architecture}.sh" >"${tmpdir}/miniforge.sh"
-                    bash "${tmpdir}/miniforge.sh" -b -p "${HOME}/opt/miniforge"
+                    bash "${tmpdir}/miniforge.sh" -b -p "${HOME}/.local/opt/miniforge"
                 fi
             fi
             unset _yesno
@@ -1034,7 +1034,7 @@ EOF
 
             # Enable corepack
             log_info 'Enable corepack.'
-            run_with_nix_wrapper "corepack enable --install-directory '${HOME}/bin'"
+            run_with_nix_wrapper "corepack enable --install-directory '${HOME}/.local/bin'"
         fi
 
         # Configure Rust
@@ -1052,7 +1052,7 @@ EOF
                 # Install Rust
                 log_info 'Installing Rust...'
                 if ! is_dry_run; then
-                    curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/opt/rustup" sh -s -- -y --no-modify-path
+                    curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/.local/opt/rustup" sh -s -- -y --no-modify-path
                     source "${HOME}/.cargo/env"
                 fi
 

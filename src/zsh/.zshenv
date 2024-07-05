@@ -6,7 +6,7 @@ export XDG_STATE_HOME="${HOME}/.local/state"
 
 # [ is_linux start ]
 # Make wezterm connect happy
-export PATH="${HOME}/bin:${HOME}/.nix-profile/bin${PATH:+:${PATH}}"
+export PATH="${HOME}/.local/bin:${HOME}/.nix-profile/bin${PATH:+:${PATH}}"
 
 # Ensure shell integration is hookup up only once
 export WEZTERM_SHELL_SKIP_ALL=1

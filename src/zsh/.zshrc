@@ -24,7 +24,7 @@ fi
 # [ use_chroot start ]
 # Set up shell for nix
 if [[ -z "${_NIX_USER_CHROOT}" ]]; then
-    _NIX_USER_CHROOT=1 exec "${HOME}/bin/nix-user-chroot" "${HOME}/.nix" zsh -l
+    _NIX_USER_CHROOT=1 exec "${HOME}/.local/bin/nix-user-chroot" "${HOME}/.nix" zsh -l
     exit
 else
     source "${HOME}/.nix-profile/etc/profile.d/nix.sh"
@@ -137,7 +137,7 @@ export VISUAL='nvim'
 # Set path
 typeset -U path
 # [ is_linux start ]
-export path=("${HOME}/bin" ${path})
+export path=("${HOME}/.local/bin" ${path})
 # [ is_linux end ]
 # [ is_macos start ]
 export path=(
@@ -435,7 +435,7 @@ alias cd='z'
 
 # [ is_linux start ]
 # Initialize conda
-eval "$("${HOME}/opt/miniforge/bin/conda" shell.zsh hook)"
+eval "$("${HOME}/.local/opt/miniforge/bin/conda" shell.zsh hook)"
 
 # Initialize rust
 source "${HOME}/.cargo/env"
