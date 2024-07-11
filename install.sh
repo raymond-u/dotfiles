@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.1'
+version='0.10.2'
 
 # Scripts
 crypto=src/crypto.sh
@@ -798,12 +798,17 @@ experimental-features = flakes nix-command
 max-jobs = auto
 EOF"
                 elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
-                    run_with_nix_wrapper "mkdir -p /nix/etc/nix; cat >>/nix/etc/nix/nix.conf <<'EOF'
+                    if ! is_dry_run; then
+                        mkdir -p "${HOME}/.config/nix"
+                        cat >>"${HOME}/.config/nix/nix.conf" <<'EOF'
 always-allow-substitutes = true
 auto-optimise-store = true
+build-users-group =
 experimental-features = flakes nix-command
 max-jobs = auto
-EOF"
+sandbox = false
+EOF
+                    fi
                 else
                     if ! is_dry_run; then
                         mkdir -p "${HOME}/.config/nix"
@@ -845,7 +850,7 @@ EOF
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
                             mv "${tmpdir}/nix-user-chroot" "${HOME}/.local/bin"
-                            run_with_nix_wrapper "echo 'sandbox = false' >>/nix/etc/nix/nix.conf; sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes"
+                            run_with_nix_wrapper "sh <(curl -fsSL https://nixos.org/nix/install) --no-daemon --no-channel-add --no-modify-profile --yes"
                         fi
                         reminders+=('Nix: note that you can only use Nix and the installed packages within the shell started by nix-user-chroot.')
                         ;;
@@ -865,7 +870,6 @@ EOF
                         log_info "When done, please enter exit."
                         if ! is_dry_run; then
                             mkdir -p "${HOME}/.nix"
-                            echo 'sandbox = false' >>"${HOME}/.config/nix/nix.conf"
                             mv "${tmpdir}/proot" "${HOME}/.local/bin"
                             "${HOME}/.local/bin/proot" -b "${HOME}/.nix:/nix"
                         fi
@@ -877,35 +881,15 @@ EOF
 
             # Use mirror for Nix
             if is_true use_mirror; then
-                _can_use_mirror=true
-                if [[ ! -f /etc/nix/nix.conf || ! "$(</etc/nix/nix.conf)" =~ 'https://mirrors.ustc.edu.cn/nix-channels/store' ]]; then
+                log_info 'Use USTC mirror for Nix.'
+                if ! is_dry_run; then
+                    mkdir -p "${HOME}/.config/nix"
+                    echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
+                    run_with_nix_wrapper 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
                     if is_true can_sudo; then
-                        log_info 'Add USTC mirror as a trusted substituter.'
-                        is_dry_run || sudo bash -c 'mkdir -p /etc/nix; echo "trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store" >>/etc/nix/nix.conf'
-                    elif is_true use_bwrap || is_true use_chroot || is_true use_proot; then
-                        log_info 'Add USTC mirror as a trusted substituter.'
-                        run_with_nix_wrapper "mkdir -p /nix/etc/nix; echo 'trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store' >>/nix/etc/nix/nix.conf"
-                    else
-                        log_error 'Warning: USTC mirror is not a trusted substituter. Sudo is needed to add it to /etc/nix/nix.conf.'
-                        log_error 'Abort setting mirror for Nix.'
-                        _can_use_mirror=false
+                        sudo systemctl restart nix-daemon
                     fi
                 fi
-                if is_true _can_use_mirror; then
-                    log_info 'Use USTC mirror for Nix.'
-                    if ! is_dry_run; then
-                        mkdir -p "${HOME}/.config/nix"
-                        echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
-                        run_with_nix_wrapper 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
-                        if is_true can_sudo; then
-                            sudo systemctl restart nix-daemon
-                        fi
-                    fi
-                else
-                    # Add default channel
-                    run_with_nix_wrapper 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
-                fi
-                unset _can_use_mirror
             else
                 # Add default channel
                 run_with_nix_wrapper 'nix-channel --add https://nixos.org/channels/nixpkgs-unstable'
