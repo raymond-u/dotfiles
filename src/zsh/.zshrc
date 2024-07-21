@@ -50,7 +50,7 @@ setopt HIST_SAVE_NO_DUPS      # Don't write duplicates in the history file
 setopt INTERACTIVE_COMMENTS   # Allow comments in interactive shells
 setopt LIST_ROWS_FIRST        # Lay out the completion list horizontally
 setopt MULTIOS                # Cast multiple redirections to tees or cats implicitly
-setopt NO_FLOWCONTROL         # Disable flow control key bindings
+setopt NO_FLOW_CONTROL        # Disable flow control key bindings
 setopt PROMPT_SUBST           # Enable parameter expansion, command substitution and arithmetic expansion
 setopt RC_QUOTES              # Use two single quotes to signify a single quote within singly quoted strings
 setopt SHORT_LOOPS            # Allow the short forms of for, repeat, select, if, and function constructs
