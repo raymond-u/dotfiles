@@ -820,7 +820,6 @@ max-jobs = auto
 EOF
                     fi
                 fi
-                reminders+=( 'Nix: if you are using Nix on an NFS file system, please add "use-sqlite-wal = false" to the Nix configuration.')
                 case "${_nix_installation}" in
                     multi-user)
                         log_info 'Installing Nix in multi-user mode...'
@@ -952,7 +951,7 @@ EOF
         fi
         if is_true use_bwrap || is_true use_chroot || is_true use_proot; then
             reminders+=('WezTerm: "WezTerm connect" won'\''t be able to find the server application.')
-            reminders+=("WezTerm: you can launch the server daemon manually or install WezTerm seperately.")
+            reminders+=("WezTerm: you should launch the mux server daemon manually if you want to use the multiplexer.")
         fi
 
         # Install with pipx
@@ -975,6 +974,7 @@ EOF
 
             is_dry_run || rm -rf "${HOME}/.local/share/nvim"
             reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
+            reminders+=('Neovim: after that, run ":MasonInstallAll" to install LSP servers and other tools.')
         fi
 
         # Configure Conda
@@ -1208,6 +1208,7 @@ EOF
 
             is_dry_run || rm -rf "${HOME}/.local/share/nvim"
             reminders+=('Neovim: Neovim will self-update when it is launched for the first time.')
+            reminders+=('Neovim: after that, run ":MasonInstallAll" to install LSP servers and other tools.')
         fi
 
         # Configure Node.js
