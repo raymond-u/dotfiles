@@ -399,7 +399,7 @@ zinit lucid depth"1" light-mode for                                             
 
 # Load plugins
 zinit wait lucid depth"1" for                                                                                         \
-    atinit"ZINIT[COMPINIT_OPTS]=-C; zicompinit"                                                                       \
+    atinit"ZINIT[COMPINIT_OPTS]=-C; ZINIT[ZCOMPDUMP_PATH]=${HOME}/.local/state/zsh/zcompdump; zicompinit"             \
     compile"lib/{*ftb*,zsh-ls-colors/ls-colors.zsh}"                                                                  \
     blockf                                                                                                            \
         Aloxaf/fzf-tab                                                                                                \
