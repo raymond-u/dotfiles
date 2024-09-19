@@ -950,8 +950,8 @@ EOF
             curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
         fi
         if is_true use_bwrap || is_true use_chroot || is_true use_proot; then
-            reminders+=('WezTerm: "WezTerm connect" won'\''t be able to find the server application.')
-            reminders+=("WezTerm: you should launch the mux server daemon manually if you want to use the multiplexer.")
+            reminders+=('WezTerm: WezTerm multiplexer won'\''t work out of the box.')
+            reminders+=("WezTerm: You need to run 'nix bundle nixpkgs#wezterm' and put the output binary to your PATH, then run 'wezterm-mux-server --daemonize' to start the server.")
         fi
 
         # Install with pipx
