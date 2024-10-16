@@ -37,6 +37,7 @@ brew "hyperfine"
 brew "onefetch"
 brew "pandoc"
 brew "rename"
+brew "rsync"
 brew "task"
 brew "tealdeer"
 
