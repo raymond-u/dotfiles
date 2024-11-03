@@ -60,7 +60,6 @@ brew "wget"
 brew "xh"
 
 # Development
-brew "corepack"
 brew "dotnet"
 brew "node"
 brew "openjdk"
