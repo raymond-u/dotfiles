@@ -193,6 +193,9 @@ export LESSHISTFILE="${HOME}/.local/state/less/history"
 export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
 export MANROFFOPT='-c'
 
+# Configure python
+export PYTHON_HISTORY="${HOME}/.local/state/python/history"
+
 # [ is_linux start ]
 # Configure rustup
 export RUSTUP_HOME="${HOME}/.local/opt/rustup"

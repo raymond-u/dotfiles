@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.4'
+version='0.10.5'
 
 # Scripts
 crypto=src/crypto.sh
@@ -1072,7 +1072,7 @@ EOF
     elif is_true is_macos; then
         # Create empty folders
         log_info 'Create empty folders in the home directory.'
-        is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt,share/man} "${HOME}/.local/state/"{less,zsh} "${HOME}/Developer" "${HOME}/Playground"
+        is_dry_run || mkdir -p "${HOME}/.local/"{bin,opt,share/man} "${HOME}/.local/state/"{less,python,zsh} "${HOME}/Developer" "${HOME}/Playground"
 
         # Prompt for the identity file
         is_true has_identity || prompt_for_yesno 'Do you have the identity file? (Choose no if you have no idea what it is.)' 'n' has_identity
