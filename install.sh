@@ -197,7 +197,7 @@ nix_pkgs=(
     '  p7zip'
     '  pandoc'
     '  rename'
-    '  taskwarrior'
+    '  taskwarrior3'
     '  tealdeer'
     '  unrar'
     ''
