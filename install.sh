@@ -1041,7 +1041,7 @@ EOF
 
                 # Install rust-script
                 log_info 'Installing rust-script...'
-                is_dry_run || cargo install rust-script
+                is_dry_run || RUSTUP_HOME="${HOME}/.local/opt/rustup" cargo install rust-script
             fi
             unset _yesno
         fi
