@@ -439,6 +439,7 @@ run_with_nix_wrapper() {
                       --ro-bind  /usr           /usr   \
                       --bind     /home          /home  \
                       --bind     /opt           /opt   \
+                      --bind     /root          /root  \
                       --bind     /run           /run   \
                       --bind     /sys           /sys   \
                       --bind     /tmp           /tmp   \
