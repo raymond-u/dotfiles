@@ -993,6 +993,7 @@ EOF
 channels:
   - conda-forge
   - bioconda
+  - pytorch
 channel_alias: https://mirrors.ustc.edu.cn/anaconda/cloud
 always_yes: true
 show_channel_urls: true
