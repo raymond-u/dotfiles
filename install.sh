@@ -886,6 +886,7 @@ EOF
                     echo 'substituters = https://mirrors.ustc.edu.cn/nix-channels/store https://cache.nixos.org/' >>"${HOME}/.config/nix/nix.conf"
                     run_with_nix_wrapper 'nix-channel --add https://mirrors.ustc.edu.cn/nix-channels/nixpkgs-unstable nixpkgs'
                     if is_true can_sudo; then
+                        echo 'trusted-substituters = https://mirrors.ustc.edu.cn/nix-channels/store' | sudo tee -a /etc/nix/nix.conf
                         sudo systemctl restart nix-daemon
                     fi
                 fi
