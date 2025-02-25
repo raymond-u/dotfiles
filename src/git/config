@@ -1,17 +1,32 @@
 # [ ? age ] base64=YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBJN1JldzdJSnM1cHlBMEhwbU1zTzdVNlpZejJBeGFQZlJnbE14Ty9KTDFzClg0ODkyNGhFS1JvV1ltZ3FJcXJlTGlaU2UrTFQ0NjFSdktCM05RM2dkRzAKLS0tIDNzVTcxZDAzK0xoR2hmZ3p6TTg2U0pRc1VGWk5CYS9UL2pUY3VEdWFOK2cK0oPr+vrz4JrnBeJALbJNeFhorssstoUJnCKUtVPVHdiybVKUKgaynGiYwfjf77RV/eHExUHKTX2yqGiDLxWI1o3AnKofXmh3aaYn6GSydZRv9Scd8QC9netbjCDjxIsNIkSKSkbHSjCbakxRS7QEww==
-[init]
-  defaultBranch = main
-[push]
-  default = current
 [color]
   ui = auto
+[column]
+  ui = auto
+[branch]
+  sort = -committerdate
+[tag]
+  sort = version:refname
+[diff]
+  algorithm = histogram
+  colorMoved = plain
+  mnemonicPrefix = true
+  renames = true
+[init]
+  defaultBranch = main
 [core]
   autocrlf = input
+[fetch]
+  all = true
+  prune = true
+  pruneTags = true
 [merge]
   ff = only
-[fetch]
-  prune = true
+[push]
+  autoSetupRemote = true
+  default = simple
+  followTags = true
 [rebase]
-  autosquash = true
-[diff]
-  colorMoved = zebra
+  autoSquash = true
+  autoStash = true
+  updateRefs = true
