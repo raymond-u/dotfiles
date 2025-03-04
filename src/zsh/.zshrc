@@ -144,6 +144,7 @@ export path=("${HOME}/.local/bin" ${path})
 # [ is_macos start ]
 export path=(
     "${HOME}/.local/bin"
+    "${HOME}/.cargo/bin"
     "$(brew --prefix)/opt/coreutils/libexec/gnubin"
     "$(brew --prefix)/opt/findutils/libexec/gnubin"
     "$(brew --prefix)/opt/gawk/libexec/gnubin"
