@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.5'
+version='0.10.6'
 
 # Scripts
 crypto=src/crypto.sh
@@ -118,7 +118,6 @@ brew_pkgs=(
     '  pipx'
     '  python'
     '  r'
-    '  rust'
     ''
     '# Fonts'
     '  font-sarasa-gothic'
@@ -1046,7 +1045,7 @@ EOF
             unset _yesno
         fi
 
-        # Set up dotfiles beforehand
+        # Set up dotfiles
         log_section 'Dotfiles Setup'
         put_file 'Aria2' "${aria2}" "${HOME}/.config/aria2/aria2.conf"
         put_file 'bottom' "${bottom}" "${HOME}/.config/bottom/bottom.toml"
@@ -1219,6 +1218,32 @@ EOF
             # Enable corepack
             log_info 'Enable corepack.'
             is_dry_run || corepack enable
+        fi
+
+        # Configure Rust
+        if ! is_true update; then
+            log_section 'Rust Configuration'
+
+            # Prompt for installation of Rust
+            prompt_for_yesno 'Do you want to install the Rust toolchain and rust-script?' 'y' _yesno
+            if is_true _yesno; then
+                # Connecting to crates is fast enough, so no need to use a mirror
+                if is_true use_mirror; then
+                    log_info 'Cargo does not require the use of a mirror.'
+                fi
+
+                # Install Rust
+                log_info 'Installing Rust...'
+                if ! is_dry_run; then
+                    curl -fsSL https://sh.rustup.rs | RUSTUP_HOME="${HOME}/.local/opt/rustup" sh -s -- -y --no-modify-path
+                    source "${HOME}/.cargo/env"
+                fi
+
+                # Install rust-script
+                log_info 'Installing rust-script...'
+                is_dry_run || RUSTUP_HOME="${HOME}/.local/opt/rustup" cargo install rust-script
+            fi
+            unset _yesno
         fi
 
         # Configure passage

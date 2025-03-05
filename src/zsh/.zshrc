@@ -144,7 +144,6 @@ export path=("${HOME}/.local/bin" ${path})
 # [ is_macos start ]
 export path=(
     "${HOME}/.local/bin"
-    "${HOME}/.cargo/bin"
     "$(brew --prefix)/opt/coreutils/libexec/gnubin"
     "$(brew --prefix)/opt/findutils/libexec/gnubin"
     "$(brew --prefix)/opt/gawk/libexec/gnubin"
@@ -197,10 +196,8 @@ export MANROFFOPT='-c'
 # Configure python
 export PYTHON_HISTORY="${HOME}/.local/state/python/history"
 
-# [ is_linux start ]
 # Configure rustup
 export RUSTUP_HOME="${HOME}/.local/opt/rustup"
-# [ is_linux end ]
 
 # Configure taskwarrior
 export TASKRC="${HOME}/.config/task/taskrc"
@@ -449,10 +446,10 @@ alias cd='z'
 # [ is_linux start ]
 # Initialize conda
 eval "$("${HOME}/.local/opt/miniforge/bin/conda" shell.zsh hook)"
+# [ is_linux end ]
 
 # Initialize rust
 source "${HOME}/.cargo/env"
-# [ is_linux end ]
 
 # Hook up shell integration
 WEZTERM_SHELL_SKIP_ALL=0 source "${HOME}/.config/wezterm/shell-integration.sh"
