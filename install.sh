@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.6'
+version='0.10.7'
 
 # Scripts
 crypto=src/crypto.sh
@@ -115,9 +115,9 @@ brew_pkgs=(
     '  dotnet'
     '  node'
     '  openjdk'
-    '  pipx'
     '  python'
     '  r'
+    '  uv'
     ''
     '# Fonts'
     '  font-sarasa-gothic'
@@ -220,7 +220,7 @@ nix_pkgs=(
     '  dotnet-sdk'
     '  nodejs'
     '  openjdk'
-    '  pipx'
+    '  uv'
 )
 
 # Colors
@@ -954,14 +954,14 @@ EOF
             reminders+=("WezTerm: You need to run 'nix bundle nixpkgs#wezterm' and put the output binary to your PATH, then run 'wezterm-mux-server --daemonize' to start the server.")
         fi
 
-        # Install with pipx
+        # Install with uv
         if is_true update; then
-            log_info 'Updating packages with pipx...'
-            run_with_nix_wrapper 'pipx upgrade-all'
+            log_info 'Updating packages with uv...'
+            run_with_nix_wrapper 'uv tool upgrade --all'
         else
-            log_info 'Installing packages with pipx...'
+            log_info 'Installing packages with uv...'
             log_info 'Installing Poetry...'
-            run_with_nix_wrapper 'pipx install poetry'
+            run_with_nix_wrapper 'uv tool install poetry'
         fi
 
         # Configure tealdeer
@@ -1188,14 +1188,14 @@ EOF
             curl -fsSL https://raw.githubusercontent.com/wez/wezterm/main/assets/shell-integration/wezterm.sh -o "${HOME}/.config/wezterm/shell-integration.sh"
         fi
 
-        # Install with pipx
+        # Install with uv
         if is_true update; then
-            log_info 'Updating packages with pipx...'
-            is_dry_run || pipx upgrade-all
+            log_info 'Updating packages with uv...'
+            is_dry_run || uv tool upgrade --all
         else
-            log_info 'Installing packages with pipx...'
+            log_info 'Installing packages with uv...'
             log_info 'Installing Poetry...'
-            is_dry_run || pipx install poetry
+            is_dry_run || uv tool install poetry
         fi
 
         # Configure tealdeer

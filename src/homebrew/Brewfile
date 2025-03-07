@@ -63,9 +63,9 @@ brew "xh"
 brew "dotnet"
 brew "node"
 brew "openjdk"
-brew "pipx"
 brew "python"
 brew "r"
+brew "uv"
 
 # Fonts
 cask "font-sarasa-gothic"
