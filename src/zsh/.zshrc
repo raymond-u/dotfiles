@@ -181,7 +181,9 @@ export FZF_DEFAULT_OPTS='--bind space:toggle,tab:accept,enter:accept,ctrl-a:togg
 # [ is_macos start ]
 # Configure Homebrew
 export HOMEBREW_BREW_GIT_REMOTE=https://mirrors.ustc.edu.cn/brew.git
+export HOMEBREW_CORE_GIT_REMOTE=https://mirrors.ustc.edu.cn/homebrew-core.git
 export HOMEBREW_BOTTLE_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles
+export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api
 # [ is_macos end ]
 # [ use_mirror end ]
 
