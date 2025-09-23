@@ -378,13 +378,13 @@ weather() {
 # [ is_macos start ]
 # Initialize command-not-found
 # [ is_macos_arm64 start ]
-if [[ -f "$(brew --prefix)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
-    source "$(brew --prefix)/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+if [[ -f "$(brew --prefix)/Library/Homebrew/command-not-found/handler.sh" ]]; then
+    source "$(brew --prefix)/Library/Homebrew/command-not-found/handler.sh"
 fi
 # [ is_macos_arm64 end ]
 # [ ! is_macos_arm64 start ]
-if [[ -f "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
-    source "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
+if [[ -f "$(brew --prefix)/Homebrew/Library/Homebrew/command-not-found/handler.sh" ]]; then
+    source "$(brew --prefix)/Homebrew/Library/Homebrew/command-not-found/handler.sh"
 fi
 # [ ! is_macos_arm64 end ]
 # [ is_macos end ]
@@ -430,13 +430,6 @@ zinit wait lucid depth"1" light-mode for                                        
         Bhupesh-V/ugit                                                                                                \
     trigger-load"!x"                                                                                                  \
         OMZ::plugins/extract
-
-# [ is_macos start ]
-# Initialize command-not-found
-if [[ -f "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh" ]]; then
-    source "$(brew --prefix)/Homebrew/Library/Taps/homebrew/homebrew-command-not-found/handler.sh"
-fi
-# [ is_macos end ]
 
 # Initialize direnv
 eval "$(direnv hook zsh)"

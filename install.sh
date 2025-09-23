@@ -11,7 +11,7 @@ set -euo pipefail
 
 # Repo
 repo=https://github.com/raymond-u/dotfiles.git
-version='0.10.8'
+version='0.10.9'
 
 # Scripts
 crypto=src/crypto.sh
@@ -1139,10 +1139,6 @@ EOF
             if is_true is_macos_arm64; then
                 is_dry_run || eval "$(/opt/homebrew/bin/brew shellenv)"
             fi
-
-            # Install command-not-found
-            log_info 'Installing Homebrew command-not-found...'
-            is_dry_run || brew command-not-found-init
         fi
 
         # Prompt for installation of GUI applications
