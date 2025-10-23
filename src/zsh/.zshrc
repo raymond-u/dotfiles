@@ -371,9 +371,6 @@ pubip() {
     curl ipinfo.io/ip
     echo
 }
-weather() {
-    curl -fsS 'wttr.in/'"$1"'?mMAF'
-}
 
 # [ is_macos start ]
 # Initialize command-not-found
