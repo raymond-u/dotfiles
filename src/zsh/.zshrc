@@ -227,6 +227,9 @@ alias quit='exit'
 alias rl='readlink -f'
 alias rp='realpath'
 alias xxd='hexyl'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias -- -='cd -'
 
 # Aliases for user commands
 # [ is_linux start ]
@@ -360,6 +363,19 @@ port() {
     fi
 }
 # [ can_sudo end ]
+mkcd () {
+  dir -p "$1"
+  cd "$1"
+}
+tmp () {
+  cd "$(mktemp -d)"
+  chmod -R 0700 .
+  if (( $# == 1 )); then
+      mkdir -p "$1"
+      cd "$1"
+      chmod -R 0700 .
+  fi
+}
 lanip() {
     if [[ -n "$(command -v ifconfig)" ]]; then
         ifconfig | sed -En "s/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p"
