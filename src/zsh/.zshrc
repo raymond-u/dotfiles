@@ -188,12 +188,15 @@ export HOMEBREW_API_DOMAIN=https://mirrors.ustc.edu.cn/homebrew-bottles/api
 # [ use_mirror end ]
 
 # Configure less
-export LESS='-R -i --wheel-lines=3'
+export LESS='-R -i --wheel-lines=3 --mouse'
 export LESSHISTFILE="${HOME}/.local/state/less/history"
 
 # Configure man
-export MANPAGER='sh -c "col -bx | bat -l man -p --pager \"less -R --mouse\""'
+export MANPAGER='sh -c "col -bx | bat -l man -p"'
 export MANROFFOPT='-c'
+
+# Configure pager
+export PAGER='bat --color always --style grid,numbers --pager less'
 
 # Configure python
 export PYTHON_HISTORY="${HOME}/.local/state/python/history"
@@ -209,18 +212,18 @@ export WGETRC="${HOME}/.config/wget/wgetrc"
 
 # Aliases for system commands
 alias c='cat'
-alias cat='bat --pager "less -RXFe"'
+alias cat='bat'
 alias d='wget'
 alias e='nvim'
 alias fd='fd -HI'
 alias l='ls'
 alias la='ls -la'
 alias ll='ls -laF'
-alias ls='eza --icons --group-directories-first'
-alias lsd='eza -D --icons'
+alias ls='eza --icons --group-directories-first --no-quotes'
+alias lsd='eza -D --icons --no-quotes'
 alias le='less'
-alias les='bat --pager "less -RS --mouse" --color always --style grid,numbers -S'
-alias less='bat --pager "less -R --mouse" --color always --style grid,numbers'
+alias les='bat --paging always -S'
+alias less='bat --paging always'
 alias mkdir='mkdir -p'
 alias p='chafa --format sixels'
 alias quit='exit'
